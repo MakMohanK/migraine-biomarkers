@@ -1,0 +1,2 @@
+session_minutes,total_keys,space_count,backspace_count,keys_per_min,space_per_min,backspace_per_100_chars,avg_pause_seconds,avg_key_hold_seconds,migraine_label
+0.26,64,6,0,249.8,23.42,0.0,0.194,0.079,0
