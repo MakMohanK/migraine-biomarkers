@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MigraineSense – Live Dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- ── TOP NAV ─────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="brain-icon">🧠</span>
+    <span class="brand-name">MigraineSense</span>
+    <span class="brand-sub">Early Warning System</span>
+  </div>
+  <div class="nav-status">
+    <span class="status-dot" id="connectionDot"></span>
+    <span id="connectionLabel">Connecting…</span>
+    <span class="nav-time" id="clockDisplay"></span>
+  </div>
+</nav>
+
+<!-- ── ALERT BANNER ───────────────────────────────────── -->
+<div class="alert-banner hidden" id="alertBanner">
+  <span id="alertIcon">⚠️</span>
+  <span id="alertText">Warning message</span>
+  <button onclick="dismissAlert()">✕</button>
+</div>
+
+<!-- ── MAIN GRID ──────────────────────────────────────── -->
+<main class="main-grid">
+
+  <!-- ── HERO GAUGE CARD ──────────────────────────────── -->
+  <section class="card hero-card">
+    <div class="hero-left">
+      <div class="gauge-wrap">
+        <canvas id="gaugeCanvas" width="220" height="220"></canvas>
+        <div class="gauge-center">
+          <div class="gauge-score" id="gaugeScore">0</div>
+          <div class="gauge-label">Risk Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="risk-badge" id="riskBadge">LOW</div>
+      <div class="eta-block">
+        <div class="eta-icon">⏱</div>
+        <div>
+          <div class="eta-title">Estimated Onset</div>
+          <div class="eta-value" id="etaValue">No risk detected</div>
+        </div>
+      </div>
+      <div class="trend-block">
+        <div class="trend-icon" id="trendIcon">→</div>
+        <div>
+          <div class="eta-title">Trend</div>
+          <div class="trend-value" id="trendValue">Stable</div>
+        </div>
+      </div>
+      <div class="ml-block">
+        <span class="ml-label">ML Model</span>
+        <span class="ml-badge" id="mlBadge">Learning…</span>
+        <span class="ml-score">Anomaly: <b id="mlScore">0</b>%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DOMAIN RISK BARS ──────────────────────────────── -->
+  <section class="card domain-card">
+    <h3 class="card-title">📊 Domain Risk Breakdown</h3>
+    <div class="domain-grid">
+      <div class="domain-item">
+        <div class="domain-header">
+          <span>⌨️ Keyboard</span>
+          <span class="domain-pct" id="kbPct">0%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill kb-fill" id="kbBar"></div></div>
+        <div class="domain-hints" id="kbHints"></div>
+      </div>
+      <div class="domain-item">
+        <div class="domain-header">
+          <span>🖱 Mouse</span>
+          <span class="domain-pct" id="msPct">0%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill ms-fill" id="msBar"></div></div>
+        <div class="domain-hints" id="msHints"></div>
+      </div>
+      <div class="domain-item">
+        <div class="domain-header">
+          <span>👁 Webcam</span>
+          <span class="domain-pct" id="wcPct">0%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill wc-fill" id="wcBar"></div></div>
+        <div class="domain-hints" id="wcHints"></div>
+      </div>
+      <div class="domain-item">
+        <div class="domain-header">
+          <span>🖥 System</span>
+          <span class="domain-pct" id="sysPct">0%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill sys-fill" id="sysBar"></div></div>
+        <div class="domain-hints" id="sysHints"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LIVE RISK TIMELINE ─────────────────────────────── -->
+  <section class="card chart-card">
+    <h3 class="card-title">📈 Risk Timeline (last 60 readings)</h3>
+    <div class="chart-wrap">
+      <canvas id="timelineChart"></canvas>
+    </div>
+  </section>
+
+  <!-- ── LIVE METRICS GRID ──────────────────────────────── -->
+  <section class="card metrics-card">
+    <h3 class="card-title">🔬 Live Sensor Metrics</h3>
+    <div class="metrics-grid">
+      <!-- Keyboard -->
+      <div class="metric-group">
+        <div class="metric-group-title">⌨️ Keyboard</div>
+        <div class="metric-row"><span>Typing Speed</span><span id="m_kpm">— kpm</span></div>
+        <div class="metric-row"><span>Error Rate</span><span id="m_err">— %</span></div>
+        <div class="metric-row"><span>Pause Count</span><span id="m_pause">—</span></div>
+        <div class="metric-row"><span>Rhythm CV</span><span id="m_cv">—</span></div>
+      </div>
+      <!-- Mouse -->
+      <div class="metric-group">
+        <div class="metric-group-title">🖱 Mouse</div>
+        <div class="metric-row"><span>Avg Speed</span><span id="m_mspd">— px/s</span></div>
+        <div class="metric-row"><span>Jitter</span><span id="m_jit">—</span></div>
+        <div class="metric-row"><span>Click Rate</span><span id="m_clk">— /min</span></div>
+        <div class="metric-row"><span>Idle Time</span><span id="m_midle">— s</span></div>
+      </div>
+      <!-- Webcam -->
+      <div class="metric-group">
+        <div class="metric-group-title">👁 Webcam</div>
+        <div class="metric-row"><span>Blink Rate</span><span id="m_bpm">— bpm</span></div>
+        <div class="metric-row"><span>EAR Score</span><span id="m_ear">—</span></div>
+        <div class="metric-row"><span>Head Tilt</span><span id="m_tilt">— °</span></div>
+        <div class="metric-row"><span>Proximity</span><span id="m_prox">— px</span></div>
+      </div>
+      <!-- System -->
+      <div class="metric-group">
+        <div class="metric-group-title">🖥 System</div>
+        <div class="metric-row"><span>CPU</span><span id="m_cpu">— %</span></div>
+        <div class="metric-row"><span>Memory</span><span id="m_mem">— %</span></div>
+        <div class="metric-row"><span>Brightness</span><span id="m_bright">— %</span></div>
+        <div class="metric-row"><span>App Switches</span><span id="m_sw">— /min</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ALERT HISTORY ──────────────────────────────────── -->
+  <section class="card alerts-card">
+    <h3 class="card-title">🔔 Alert History</h3>
+    <div class="alerts-list" id="alertsList">
+      <div class="no-alerts">No alerts yet — you're doing great! 🎉</div>
+    </div>
+  </section>
+
+  <!-- ── WELLNESS TIPS ──────────────────────────────────── -->
+  <section class="card tips-card">
+    <h3 class="card-title">💡 Wellness Tips</h3>
+    <div id="tipsList" class="tips-list">
+      <div class="tip-item active">👀 Follow the 20-20-20 rule: every 20 min, look 20 ft away for 20 sec.</div>
+      <div class="tip-item">💧 Stay hydrated — dehydration is a major migraine trigger.</div>
+      <div class="tip-item">🌙 Maintain a consistent sleep schedule.</div>
+      <div class="tip-item">🌡 Keep screen brightness ≤ 70% in dark environments.</div>
+      <div class="tip-item">🧘 Short breathing exercises reduce tension headaches.</div>
+      <div class="tip-item">🍵 Limit caffeine to 1-2 cups per day.</div>
+    </div>
+    <div class="tip-nav">
+      <button onclick="prevTip()">◀</button>
+      <span id="tipCounter">1 / 6</span>
+      <button onclick="nextTip()">▶</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── FOOTER ─────────────────────────────────────────── -->
+<footer class="footer">
+  <span>MigraineSense v1.0 — Passive Early-Warning System</span>
+  <span id="lastUpdate">Last update: —</span>
+</footer>
+
+<!-- Socket.IO: served locally via /assets/ (avoids Flask-SocketIO's reserved /socket.io/ prefix) -->
+<script src="/assets/socket.io.js"
+        onerror="
+          var s=document.createElement('script');
+          s.src='https://cdn.socket.io/4.7.2/socket.io.min.js';
+          document.body.appendChild(s);
+        "></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+        onerror="
+          var s=document.createElement('script');
+          s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+          document.body.appendChild(s);
+        "></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>
