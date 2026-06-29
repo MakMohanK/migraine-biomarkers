@@ -1,0 +1,186 @@
+{
+  "session": {
+    "session_id": "SESSION-20240615-00472",
+    "patient_id": "PAT-00123",
+    "created_at": "2024-06-15T14:32:00Z",
+    "migraine_phase": "headache",
+    "migraine_type": "migraine_with_aura",
+    "pain_score": 7,
+    "therapy_profile": "moderate",
+    "total_duration_min": 30,
+    "bluetooth_device": "HC-05::98:D3:32:20:A4:C1"
+  },
+
+  "actuators": {
+
+    "frontal_lobe": {
+      "enabled": true,
+      "technique": "SUSTAINED_PRESSURE",
+      "intensity_level": 6,
+      "pressure_kpa": 18.5,
+      "frequency_hz": 0,
+      "cycle_pattern": {
+        "on_seconds": 30,
+        "off_seconds": 10,
+        "repeat_count": -1
+      },
+      "duration_seconds": 1800,
+      "ramp_up_seconds": 5,
+      "ramp_down_seconds": 5,
+      "notes": "Primary headache zone — sustained compression to reduce vascular dilation at frontal lobe"
+    },
+
+    "parietal_lobe": {
+      "enabled": true,
+      "technique": "CIRCULAR",
+      "intensity_level": 5,
+      "pressure_kpa": 14.0,
+      "frequency_hz": 0.5,
+      "cycle_pattern": {
+        "on_seconds": 20,
+        "off_seconds": 10,
+        "repeat_count": -1
+      },
+      "duration_seconds": 1800,
+      "ramp_up_seconds": 8,
+      "ramp_down_seconds": 8,
+      "notes": "Circular motion to improve circulation and reduce tension in parietal scalp area"
+    },
+
+    "occipital_lobe": {
+      "enabled": true,
+      "technique": "TRIGGER_POINT",
+      "intensity_level": 7,
+      "pressure_kpa": 22.0,
+      "frequency_hz": 0,
+      "cycle_pattern": {
+        "on_seconds": 45,
+        "off_seconds": 15,
+        "repeat_count": 20
+      },
+      "duration_seconds": 1200,
+      "ramp_up_seconds": 6,
+      "ramp_down_seconds": 6,
+      "notes": "Trigger point release at sub-occipital muscles — key area for migraine with aura type"
+    },
+
+    "right_temporal": {
+      "enabled": true,
+      "technique": "RHYTHMIC_TAPPING",
+      "intensity_level": 4,
+      "pressure_kpa": 10.0,
+      "frequency_hz": 1.2,
+      "cycle_pattern": {
+        "on_seconds": 15,
+        "off_seconds": 5,
+        "repeat_count": -1
+      },
+      "duration_seconds": 900,
+      "ramp_up_seconds": 4,
+      "ramp_down_seconds": 4,
+      "notes": "Gentle rhythmic tapping near right ear — targets temporal artery region"
+    },
+
+    "left_temporal": {
+      "enabled": true,
+      "technique": "RHYTHMIC_TAPPING",
+      "intensity_level": 4,
+      "pressure_kpa": 10.0,
+      "frequency_hz": 1.2,
+      "cycle_pattern": {
+        "on_seconds": 15,
+        "off_seconds": 5,
+        "repeat_count": -1
+      },
+      "duration_seconds": 900,
+      "ramp_up_seconds": 4,
+      "ramp_down_seconds": 4,
+      "notes": "Mirror of right temporal — symmetric bilateral tapping to balance pressure"
+    }
+
+  },
+
+  "temperature_pads": {
+
+    "frontal_pad": {
+      "enabled": true,
+      "mode": "COLD",
+      "target_temp_celsius": 15.0,
+      "duration_seconds": 1800,
+      "ramp_rate_celsius_per_min": 2.0,
+      "notes": "Cold therapy on frontal zone — reduces inflammation and numbs pain receptors. Effective for migraine with aura."
+    },
+
+    "occipital_pad": {
+      "enabled": true,
+      "mode": "ALTERNATING",
+      "target_temp_celsius": null,
+      "duration_seconds": 1200,
+      "alternating_cycle": {
+        "heat_temp_celsius": 38.5,
+        "cold_temp_celsius": 14.0,
+        "heat_duration_seconds": 120,
+        "cold_duration_seconds": 90,
+        "repeat_count": 6
+      },
+      "ramp_rate_celsius_per_min": 3.0,
+      "notes": "Alternating hot-cold at occipital zone to stimulate blood flow and release muscle tension at base of skull"
+    }
+
+  },
+
+  "therapy_sequence": [
+    {
+      "phase_name": "Warm Up",
+      "phase_order": 1,
+      "duration_seconds": 120,
+      "active_zones": ["frontal_lobe", "parietal_lobe", "right_temporal", "left_temporal"],
+      "override_intensity": 2
+    },
+    {
+      "phase_name": "Cold Onset",
+      "phase_order": 2,
+      "duration_seconds": 300,
+      "active_zones": ["frontal_pad", "frontal_lobe"],
+      "override_intensity": 5
+    },
+    {
+      "phase_name": "Full Therapy Active",
+      "phase_order": 3,
+      "duration_seconds": 900,
+      "active_zones": [
+        "frontal_lobe",
+        "parietal_lobe",
+        "occipital_lobe",
+        "right_temporal",
+        "left_temporal",
+        "frontal_pad",
+        "occipital_pad"
+      ],
+      "override_intensity": null
+    },
+    {
+      "phase_name": "Occipital Deep Release",
+      "phase_order": 4,
+      "duration_seconds": 300,
+      "active_zones": ["occipital_lobe", "occipital_pad"],
+      "override_intensity": 7
+    },
+    {
+      "phase_name": "Cool Down",
+      "phase_order": 5,
+      "duration_seconds": 180,
+      "active_zones": ["frontal_lobe", "parietal_lobe", "right_temporal", "left_temporal"],
+      "override_intensity": 2
+    }
+  ],
+
+  "safety": {
+    "max_pressure_kpa": 30.0,
+    "max_temp_celsius": 42.0,
+    "min_temp_celsius": 10.0,
+    "auto_stop_on_no_signal": true,
+    "session_pause_allowed": true,
+    "emergency_stop_code": "ESTOP::0xFF"
+  }
+}

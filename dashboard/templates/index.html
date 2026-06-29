@@ -4,17 +4,28 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MigraineSense – Live Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body>
 
-<!-- ── TOP NAV ─────────────────────────────────────────── -->
+<!-- ── TOP NAV ─────────────────────────────────────────────── -->
 <nav class="navbar">
   <div class="nav-brand">
     <span class="brain-icon">🧠</span>
-    <span class="brand-name">MigraineSense</span>
-    <span class="brand-sub">Early Warning System</span>
+    <div>
+      <div class="brand-name">MigraineSense</div>
+      <div class="brand-sub">Early Warning System</div>
+    </div>
   </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+    <button class="nav-tab" onclick="switchTab('helmet',this)">🪖 Helmet Therapy</button>
+    <button class="nav-tab" onclick="switchTab('history',this)">🕓 History</button>
+  </div>
+
   <div class="nav-status">
     <span class="status-dot" id="connectionDot"></span>
     <span id="connectionLabel">Connecting…</span>
@@ -22,185 +33,509 @@
   </div>
 </nav>
 
-<!-- ── ALERT BANNER ───────────────────────────────────── -->
+<!-- ── ALERT BANNER ─────────────────────────────────────────── -->
 <div class="alert-banner hidden" id="alertBanner">
   <span id="alertIcon">⚠️</span>
   <span id="alertText">Warning message</span>
   <button onclick="dismissAlert()">✕</button>
 </div>
 
-<!-- ── MAIN GRID ──────────────────────────────────────── -->
-<main class="main-grid">
+<!-- ════════════════════════════════════════════════════════════
+     TAB 1 — DASHBOARD
+════════════════════════════════════════════════════════════ -->
+<div class="page-tab active" id="tab-dashboard">
 
-  <!-- ── HERO GAUGE CARD ──────────────────────────────── -->
-  <section class="card hero-card">
-    <div class="hero-left">
+  <!-- 3-column main grid -->
+  <div class="main-grid">
+
+    <!-- ── HERO GAUGE (col 1, rows 1-2) ──────────────────── -->
+    <section class="card hero-card">
       <div class="gauge-wrap">
-        <canvas id="gaugeCanvas" width="220" height="220"></canvas>
+        <div class="gauge-glow" id="gaugeGlow"></div>
+        <canvas id="gaugeCanvas" width="200" height="200"></canvas>
         <div class="gauge-center">
           <div class="gauge-score" id="gaugeScore">0</div>
-          <div class="gauge-label">Risk Score</div>
+          <div class="gauge-label">Blended Risk</div>
         </div>
       </div>
-    </div>
-    <div class="hero-right">
-      <div class="risk-badge" id="riskBadge">LOW</div>
-      <div class="eta-block">
-        <div class="eta-icon">⏱</div>
-        <div>
-          <div class="eta-title">Estimated Onset</div>
-          <div class="eta-value" id="etaValue">No risk detected</div>
+
+      <div class="risk-badge LOW" id="riskBadge">LOW</div>
+
+      <div class="hero-stats">
+        <div class="stat-block">
+          <span class="stat-icon">⏱</span>
+          <div>
+            <div class="stat-label">Estimated Onset</div>
+            <div class="stat-value" id="etaValue">No risk detected</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <span class="stat-icon" id="trendIcon">→</span>
+          <div>
+            <div class="stat-label">Trend</div>
+            <div class="stat-value" id="trendValue">Stable</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <span class="stat-icon">📡</span>
+          <div>
+            <div class="stat-label">Composite Risk</div>
+            <div class="stat-value" id="compositeVal">0%</div>
+          </div>
         </div>
       </div>
-      <div class="trend-block">
-        <div class="trend-icon" id="trendIcon">→</div>
-        <div>
-          <div class="eta-title">Trend</div>
-          <div class="trend-value" id="trendValue">Stable</div>
-        </div>
-      </div>
-      <div class="ml-block">
-        <span class="ml-label">ML Model</span>
+
+      <div class="ml-row">
+        <span class="ml-label">ML</span>
         <span class="ml-badge" id="mlBadge">Learning…</span>
         <span class="ml-score">Anomaly: <b id="mlScore">0</b>%</span>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── DOMAIN RISK BARS ──────────────────────────────── -->
-  <section class="card domain-card">
-    <h3 class="card-title">📊 Domain Risk Breakdown</h3>
-    <div class="domain-grid">
-      <div class="domain-item">
-        <div class="domain-header">
-          <span>⌨️ Keyboard</span>
-          <span class="domain-pct" id="kbPct">0%</span>
+    <!-- ── COMBINED RISK CHART (col 2-3, row 1) ──────────── -->
+    <section class="card chart-card">
+      <div class="card-title">
+        <span class="card-title-icon">📈</span>
+        Risk Timeline — Blended &amp; Composite (last 60 readings)
+        <span style="margin-left:auto;display:flex;gap:0.6rem;align-items:center">
+          <span style="display:flex;align-items:center;gap:0.3rem;font-size:0.72rem;font-weight:600;color:#7eb3ff">
+            <span style="width:20px;height:2px;background:#4f8ef7;border-radius:2px;display:inline-block"></span>Blended
+          </span>
+          <span style="display:flex;align-items:center;gap:0.3rem;font-size:0.72rem;font-weight:600;color:#06d6d6">
+            <span style="width:20px;height:2px;background:#06d6d6;border-radius:2px;display:inline-block;opacity:0.7"></span>Composite
+          </span>
+        </span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="timelineChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ── DOMAIN RISK BARS (col 2, row 2) ───────────────── -->
+    <section class="card domain-card">
+      <div class="card-title"><span class="card-title-icon">📊</span>Domain Risk Breakdown</div>
+      <div class="domain-grid">
+
+        <div class="domain-item">
+          <div class="domain-header">
+            <span>⌨️ Keyboard</span>
+            <span class="domain-pct" id="kbPct">0%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill kb-fill" id="kbBar"></div></div>
+          <div class="domain-hints" id="kbHints"></div>
         </div>
-        <div class="bar-track"><div class="bar-fill kb-fill" id="kbBar"></div></div>
-        <div class="domain-hints" id="kbHints"></div>
-      </div>
-      <div class="domain-item">
-        <div class="domain-header">
-          <span>🖱 Mouse</span>
-          <span class="domain-pct" id="msPct">0%</span>
+
+        <div class="domain-item">
+          <div class="domain-header">
+            <span>🖱 Mouse</span>
+            <span class="domain-pct" id="msPct">0%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill ms-fill" id="msBar"></div></div>
+          <div class="domain-hints" id="msHints"></div>
         </div>
-        <div class="bar-track"><div class="bar-fill ms-fill" id="msBar"></div></div>
-        <div class="domain-hints" id="msHints"></div>
-      </div>
-      <div class="domain-item">
-        <div class="domain-header">
-          <span>👁 Webcam</span>
-          <span class="domain-pct" id="wcPct">0%</span>
+
+        <div class="domain-item">
+          <div class="domain-header">
+            <span>👁 Webcam</span>
+            <span class="domain-pct" id="wcPct">0%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill wc-fill" id="wcBar"></div></div>
+          <div class="domain-hints" id="wcHints"></div>
         </div>
-        <div class="bar-track"><div class="bar-fill wc-fill" id="wcBar"></div></div>
-        <div class="domain-hints" id="wcHints"></div>
-      </div>
-      <div class="domain-item">
-        <div class="domain-header">
-          <span>🖥 System</span>
-          <span class="domain-pct" id="sysPct">0%</span>
+
+        <div class="domain-item">
+          <div class="domain-header">
+            <span>🖥 System</span>
+            <span class="domain-pct" id="sysPct">0%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill sys-fill" id="sysBar"></div></div>
+          <div class="domain-hints" id="sysHints"></div>
         </div>
-        <div class="bar-track"><div class="bar-fill sys-fill" id="sysBar"></div></div>
-        <div class="domain-hints" id="sysHints"></div>
+
+      </div>
+    </section>
+
+    <!-- ── LIVE SENSOR METRICS (col 3, row 2) ────────────── -->
+    <section class="card metrics-card">
+      <div class="card-title"><span class="card-title-icon">🔬</span>Live Sensor Metrics</div>
+      <div class="metrics-grid">
+
+        <div class="metric-group">
+          <div class="metric-group-title">⌨️ Keyboard</div>
+          <div class="metric-row"><span>Typing Speed</span><span id="m_kpm">—</span></div>
+          <div class="metric-row"><span>Error Rate</span><span id="m_err">—</span></div>
+          <div class="metric-row"><span>Pause Count</span><span id="m_pause">—</span></div>
+          <div class="metric-row"><span>Rhythm CV</span><span id="m_cv">—</span></div>
+        </div>
+
+        <div class="metric-group">
+          <div class="metric-group-title">🖱 Mouse</div>
+          <div class="metric-row"><span>Avg Speed</span><span id="m_mspd">—</span></div>
+          <div class="metric-row"><span>Jitter</span><span id="m_jit">—</span></div>
+          <div class="metric-row"><span>Click Rate</span><span id="m_clk">—</span></div>
+          <div class="metric-row"><span>Idle Time</span><span id="m_midle">—</span></div>
+        </div>
+
+        <div class="metric-group">
+          <div class="metric-group-title">👁 Webcam</div>
+          <div class="metric-row"><span>Blink Rate</span><span id="m_bpm">—</span></div>
+          <div class="metric-row"><span>EAR Score</span><span id="m_ear">—</span></div>
+          <div class="metric-row"><span>Head Tilt</span><span id="m_tilt">—</span></div>
+          <div class="metric-row"><span>Proximity</span><span id="m_prox">—</span></div>
+        </div>
+
+        <div class="metric-group">
+          <div class="metric-group-title">🖥 System</div>
+          <div class="metric-row"><span>CPU</span><span id="m_cpu">—</span></div>
+          <div class="metric-row"><span>Memory</span><span id="m_mem">—</span></div>
+          <div class="metric-row"><span>Brightness</span><span id="m_bright">—</span></div>
+          <div class="metric-row"><span>App Switches</span><span id="m_sw">—</span></div>
+        </div>
+
+      </div>
+    </section>
+  </div><!-- /main-grid -->
+
+  <!-- Bottom row: alerts + tips + history -->
+  <div class="bottom-row">
+
+    <section class="card alerts-card">
+      <div class="card-title"><span class="card-title-icon">🔔</span>Recent Alerts</div>
+      <div class="alerts-list" id="alertsList">
+        <div class="no-alerts">No alerts yet — you're doing great! 🎉</div>
+      </div>
+    </section>
+
+    <section class="card tips-card">
+      <div class="card-title"><span class="card-title-icon">💡</span>Wellness Tips</div>
+      <div class="tips-list" id="tipsList">
+        <div class="tip-item active">👀 Follow the 20-20-20 rule: every 20 min, look 20 ft away for 20 sec.</div>
+        <div class="tip-item">💧 Stay hydrated — dehydration is a major migraine trigger.</div>
+        <div class="tip-item">🌙 Maintain a consistent sleep schedule every day.</div>
+        <div class="tip-item">🌡 Keep screen brightness ≤ 70% in dark environments.</div>
+        <div class="tip-item">🧘 Short breathing exercises reduce tension headaches significantly.</div>
+        <div class="tip-item">🍵 Limit caffeine to 1–2 cups per day maximum.</div>
+      </div>
+      <div class="tip-nav">
+        <button onclick="prevTip()">◀</button>
+        <span id="tipCounter">1 / 6</span>
+        <button onclick="nextTip()">▶</button>
+      </div>
+    </section>
+
+    <section class="card history-card">
+      <div class="card-title"><span class="card-title-icon">📋</span>Risk Log</div>
+      <div class="history-list" id="historyList">
+        <div class="no-alerts">No history yet.</div>
+      </div>
+    </section>
+
+  </div><!-- /bottom-row -->
+</div><!-- /tab-dashboard -->
+
+
+<!-- ════════════════════════════════════════════════════════════
+     TAB 2 — HELMET THERAPY  (3-step wizard)
+════════════════════════════════════════════════════════════ -->
+<div class="page-tab" id="tab-helmet">
+  <div class="wizard-wrap">
+
+
+    <!-- ── STEP TRACKER ──────────────────────────────────── -->
+    <div class="wizard-steps">
+      <div class="wstep active" id="wstep1">
+        <div class="wstep-circle">1</div>
+        <div class="wstep-label">Bluetooth</div>
+      </div>
+      <div class="wstep-line"></div>
+      <div class="wstep" id="wstep2">
+        <div class="wstep-circle">2</div>
+        <div class="wstep-label">Therapy Setup</div>
+      </div>
+      <div class="wstep-line"></div>
+      <div class="wstep" id="wstep3">
+        <div class="wstep-circle">3</div>
+        <div class="wstep-label">Start Therapy</div>
       </div>
     </div>
-  </section>
 
-  <!-- ── LIVE RISK TIMELINE ─────────────────────────────── -->
-  <section class="card chart-card">
-    <h3 class="card-title">📈 Risk Timeline (last 60 readings)</h3>
-    <div class="chart-wrap">
-      <canvas id="timelineChart"></canvas>
-    </div>
-  </section>
+    <!-- ════════════════════════════════════════════
+         STEP 1 — BLUETOOTH CONNECTION
+    ════════════════════════════════════════════ -->
+    <div class="wizard-panel active" id="wpanel1">
+      <div class="card wizard-card">
 
-  <!-- ── LIVE METRICS GRID ──────────────────────────────── -->
-  <section class="card metrics-card">
-    <h3 class="card-title">🔬 Live Sensor Metrics</h3>
-    <div class="metrics-grid">
-      <!-- Keyboard -->
-      <div class="metric-group">
-        <div class="metric-group-title">⌨️ Keyboard</div>
-        <div class="metric-row"><span>Typing Speed</span><span id="m_kpm">— kpm</span></div>
-        <div class="metric-row"><span>Error Rate</span><span id="m_err">— %</span></div>
-        <div class="metric-row"><span>Pause Count</span><span id="m_pause">—</span></div>
-        <div class="metric-row"><span>Rhythm CV</span><span id="m_cv">—</span></div>
+        <!-- BT Off warning -->
+        <div class="bt-off-banner" id="btOffBanner">
+          <span class="bt-off-icon">📵</span>
+          <div>
+            <div class="bt-off-title">Bluetooth is turned off</div>
+            <div class="bt-off-sub">Please enable Bluetooth on your laptop, then click Scan below.</div>
+          </div>
+          <a class="btn btn-warning btn-sm" href="ms-settings:bluetooth" target="_blank">Open Settings</a>
+        </div>
+
+        <!-- Connected banner (hidden until connected) -->
+        <div class="bt-ok-banner hidden" id="btOkBanner">
+          <span>✅</span>
+          <div>
+            <div class="bt-ok-title">Device Connected</div>
+            <div class="bt-ok-sub" id="btOkSub">HC-05 ready</div>
+          </div>
+        </div>
+
+        <h2 class="wizard-heading">Connect Your Helmet Device</h2>
+        <p class="wizard-sub">Make sure your HC-05 Bluetooth module is powered on, then scan for available COM ports.</p>
+
+        <!-- Device list -->
+        <div class="wdevice-list" id="wdeviceList">
+          <div class="wdevice-empty" id="wdeviceEmpty">No devices found. Click Scan to search.</div>
+        </div>
+
+        <div class="wizard-actions">
+          <button class="btn btn-ghost" onclick="wizardScanPorts()">🔄 Scan for Devices</button>
+          <div style="display:flex;align-items:center;gap:0.6rem;">
+            <span class="form-label" style="margin:0">Baud:</span>
+            <select class="form-control" id="btBaud" style="width:auto">
+              <option value="9600" selected>9600</option>
+              <option value="38400">38400</option>
+              <option value="115200">115200</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btConnectBtn" onclick="wizardConnect()" disabled>⚡ Connect</button>
+          <button class="btn btn-ghost"   id="btDisconnectBtn" onclick="wizardDisconnect()" style="display:none">Disconnect</button>
+        </div>
+
+        <!-- BT Log -->
+        <div class="bt-log" id="btLog" style="margin-top:1rem">
+          <div class="bt-log-entry"><span class="ts">[--:--:--]</span> <span class="sys">Ready — click Scan to find HC-05.</span></div>
+        </div>
+
+        <div class="wizard-next-row">
+          <button class="btn btn-success" id="w1nextBtn" onclick="wizardGoStep(2)" disabled>Continue to Therapy Setup →</button>
+        </div>
       </div>
-      <!-- Mouse -->
-      <div class="metric-group">
-        <div class="metric-group-title">🖱 Mouse</div>
-        <div class="metric-row"><span>Avg Speed</span><span id="m_mspd">— px/s</span></div>
-        <div class="metric-row"><span>Jitter</span><span id="m_jit">—</span></div>
-        <div class="metric-row"><span>Click Rate</span><span id="m_clk">— /min</span></div>
-        <div class="metric-row"><span>Idle Time</span><span id="m_midle">— s</span></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         STEP 2 — THERAPY SETUP FORM
+    ════════════════════════════════════════════ -->
+    <div class="wizard-panel" id="wpanel2">
+      <div class="card wizard-card">
+
+        <h2 class="wizard-heading">Therapy Setup</h2>
+        <p class="wizard-sub">Fill in your details below. The system will auto-select the best therapy protocol for you.</p>
+
+        <div class="wform-grid">
+
+          <!-- Patient ID -->
+          <div class="form-group">
+            <label class="form-label">Patient ID</label>
+            <input class="form-control" type="text" id="f_patientId" placeholder="e.g. PAT-00123" value="PAT-00001"/>
+          </div>
+
+          <!-- Migraine Type -->
+          <div class="form-group">
+            <label class="form-label">Migraine Type</label>
+            <select class="form-control" id="f_migraineType" onchange="autoSelectProtocol()">
+              <option value="tension">Tension Headache</option>
+              <option value="migraine_with_aura" selected>Migraine With Aura</option>
+              <option value="migraine_without_aura">Migraine Without Aura</option>
+              <option value="cluster">Cluster Headache</option>
+              <option value="vestibular">Vestibular Migraine</option>
+              <option value="hemiplegic">Hemiplegic Migraine</option>
+            </select>
+          </div>
+
+          <!-- Migraine Phase -->
+          <div class="form-group">
+            <label class="form-label">Migraine Phase</label>
+            <select class="form-control" id="f_phase" onchange="autoSelectProtocol()">
+              <option value="prodrome">Prodrome (Early Warning)</option>
+              <option value="aura">Aura</option>
+              <option value="headache" selected>Headache (Active)</option>
+              <option value="postdrome">Postdrome (Recovery)</option>
+            </select>
+          </div>
+
+          <!-- Therapy Profile -->
+          <div class="form-group">
+            <label class="form-label">Therapy Intensity</label>
+            <select class="form-control" id="f_therapyProfile">
+              <option value="gentle">🌿 Gentle</option>
+              <option value="moderate" selected>⚡ Moderate</option>
+              <option value="intensive">🔥 Intensive</option>
+            </select>
+          </div>
+
+          <!-- Pain Score — full width -->
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Current Pain Score — <span id="painScoreLabel">7</span> / 10</label>
+            <div class="pain-slider-wrap">
+              <span style="font-size:0.75rem;color:var(--low)">1</span>
+              <input class="pain-slider" type="range" id="f_painScore" min="1" max="10" value="7"
+                oninput="document.getElementById('painScoreLabel').textContent=this.value;
+                         document.getElementById('painBadge').textContent=this.value;
+                         autoSelectProtocol()"/>
+              <span style="font-size:0.75rem;color:var(--critical)">10</span>
+              <span class="pain-score-badge" id="painBadge">7</span>
+            </div>
+          </div>
+
+          <!-- Duration — full width -->
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Session Duration</label>
+            <div class="wduration-pills" id="wdurationPills">
+              <button class="wpill" onclick="setDuration(15,this)">15 min</button>
+              <button class="wpill" onclick="setDuration(20,this)">20 min</button>
+              <button class="wpill active" onclick="setDuration(30,this)">30 min</button>
+              <button class="wpill" onclick="setDuration(45,this)">45 min</button>
+              <button class="wpill" onclick="setDuration(60,this)">60 min</button>
+            </div>
+            <input type="hidden" id="f_duration" value="30"/>
+          </div>
+
+        </div><!-- /wform-grid -->
+
+        <!-- Auto protocol banner -->
+        <div class="proto-banner" id="protoBanner">
+          <div class="proto-banner-left">
+            <span class="proto-banner-id" id="protobadge">PROTO-004</span>
+            <div>
+              <div class="proto-banner-label" id="protoLabel">Migraine With Aura — Peak Headache</div>
+              <div class="proto-banner-sub" id="protoDuration">Recommended: 35 min · Intensive</div>
+            </div>
+          </div>
+          <span class="proto-banner-icon">🔬</span>
+        </div>
+
+        <div class="wizard-next-row" style="justify-content:space-between">
+          <button class="btn btn-ghost" onclick="wizardGoStep(1)">← Back</button>
+          <button class="btn btn-success" id="w2nextBtn" onclick="wizardConfirmLoad()">Load to Device &amp; Continue →</button>
+        </div>
       </div>
-      <!-- Webcam -->
-      <div class="metric-group">
-        <div class="metric-group-title">👁 Webcam</div>
-        <div class="metric-row"><span>Blink Rate</span><span id="m_bpm">— bpm</span></div>
-        <div class="metric-row"><span>EAR Score</span><span id="m_ear">—</span></div>
-        <div class="metric-row"><span>Head Tilt</span><span id="m_tilt">— °</span></div>
-        <div class="metric-row"><span>Proximity</span><span id="m_prox">— px</span></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         STEP 3 — START THERAPY
+    ════════════════════════════════════════════ -->
+    <div class="wizard-panel" id="wpanel3">
+      <div class="card wizard-card">
+
+        <h2 class="wizard-heading">Ready to Start</h2>
+        <p class="wizard-sub">Session loaded to device. Put the helmet on and press Start when ready.</p>
+
+        <!-- Summary strip -->
+        <div class="wsummary">
+          <div class="wsummary-item">
+            <div class="wsummary-label">Protocol</div>
+            <div class="wsummary-val" id="sum_proto">—</div>
+          </div>
+          <div class="wsummary-item">
+            <div class="wsummary-label">Intensity</div>
+            <div class="wsummary-val" id="sum_intensity">—</div>
+          </div>
+          <div class="wsummary-item">
+            <div class="wsummary-label">Duration</div>
+            <div class="wsummary-val" id="sum_duration">—</div>
+          </div>
+          <div class="wsummary-item">
+            <div class="wsummary-label">Pain Score</div>
+            <div class="wsummary-val" id="sum_pain">—</div>
+          </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="session-timer">
+          <div class="timer-display" id="timerDisplay">00:00</div>
+          <div class="timer-label">Elapsed / <span id="timerTotal">00:00</span> Total</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-track"><div class="progress-bar-fill" id="sessionProgress"></div></div>
+          </div>
+        </div>
+
+        <!-- Zone status -->
+        <div class="section-label" style="margin-top:1rem">Actuator Zones</div>
+        <div class="zone-grid">
+          <div class="zone-card inactive" id="zone_frontal"><div class="zone-name">Frontal Lobe</div><div class="zone-tech" id="zt_frontal">—</div><div class="zone-pips" id="zp_frontal"><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div></div></div>
+          <div class="zone-card inactive" id="zone_parietal"><div class="zone-name">Parietal Lobe</div><div class="zone-tech" id="zt_parietal">—</div><div class="zone-pips" id="zp_parietal"><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div></div></div>
+          <div class="zone-card inactive" id="zone_occipital"><div class="zone-name">Occipital Lobe</div><div class="zone-tech" id="zt_occipital">—</div><div class="zone-pips" id="zp_occipital"><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div></div></div>
+          <div class="zone-card inactive" id="zone_right_temporal"><div class="zone-name">Right Temporal</div><div class="zone-tech" id="zt_right">—</div><div class="zone-pips" id="zp_right"><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div></div></div>
+          <div class="zone-card inactive" id="zone_left_temporal"><div class="zone-name">Left Temporal</div><div class="zone-tech" id="zt_left">—</div><div class="zone-pips" id="zp_left"><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div><div class="zone-pip"></div></div></div>
+        </div>
+
+        <!-- Pad status -->
+        <div class="section-label" style="margin-top:0.8rem">Temperature Pads</div>
+        <div class="pad-grid">
+          <div class="pad-card off" id="pad_frontal"><div class="pad-name">Frontal Pad</div><div class="pad-mode" id="padicon_frontal">❄️</div><div class="pad-mode-label" id="padlabel_frontal">—</div></div>
+          <div class="pad-card off" id="pad_occipital"><div class="pad-name">Occipital Pad</div><div class="pad-mode" id="padicon_occipital">🔥</div><div class="pad-mode-label" id="padlabel_occipital">—</div></div>
+        </div>
+
+        <!-- Big start button -->
+        <button class="start-therapy-btn" id="startBtn" onclick="startTherapy()">
+          ▶ Start Therapy
+        </button>
+
+        <!-- In-session controls (hidden until started) -->
+        <div class="insession-controls hidden" id="inSessionControls">
+          <button class="btn btn-warning" id="pauseBtn"  onclick="pauseTherapy()">⏸ Pause</button>
+          <button class="btn btn-primary" id="resumeBtn" onclick="resumeTherapy()" style="display:none">⏵ Resume</button>
+          <button class="btn btn-ghost"   id="stopBtn"   onclick="stopTherapy()">⏹ Stop</button>
+          <button class="btn btn-ghost btn-sm" onclick="requestStatus()">📡 Status</button>
+        </div>
+
+        <button class="estop-btn" id="estopBtn" onclick="emergencyStop()" disabled>
+          ⛔ EMERGENCY STOP
+        </button>
+
+        <div class="wizard-next-row" style="justify-content:flex-start;margin-top:0.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="wizardGoStep(2)">← Change Settings</button>
+          <span class="session-state-badge IDLE" id="sessionStateBadge" style="margin-left:auto">IDLE</span>
+        </div>
       </div>
-      <!-- System -->
-      <div class="metric-group">
-        <div class="metric-group-title">🖥 System</div>
-        <div class="metric-row"><span>CPU</span><span id="m_cpu">— %</span></div>
-        <div class="metric-row"><span>Memory</span><span id="m_mem">— %</span></div>
-        <div class="metric-row"><span>Brightness</span><span id="m_bright">— %</span></div>
-        <div class="metric-row"><span>App Switches</span><span id="m_sw">— /min</span></div>
+    </div>
+
+  </div><!-- /wizard-wrap -->
+</div><!-- /tab-helmet -->
+
+
+<!-- ════════════════════════════════════════════════════════════
+     TAB 3 — HISTORY
+════════════════════════════════════════════════════════════ -->
+<div class="page-tab" id="tab-history">
+  <div style="padding:1rem 1.4rem;display:flex;flex-direction:column;gap:1rem;">
+
+    <section class="card">
+      <div class="card-title"><span class="card-title-icon">📈</span>Risk Score History (last 120 readings)</div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="historyChart"></canvas>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── ALERT HISTORY ──────────────────────────────────── -->
-  <section class="card alerts-card">
-    <h3 class="card-title">🔔 Alert History</h3>
-    <div class="alerts-list" id="alertsList">
-      <div class="no-alerts">No alerts yet — you're doing great! 🎉</div>
-    </div>
-  </section>
+    <section class="card">
+      <div class="card-title"><span class="card-title-icon">🔔</span>Full Alert History</div>
+      <div class="alerts-list" id="fullAlertsList" style="max-height:340px">
+        <div class="no-alerts">No alerts yet.</div>
+      </div>
+    </section>
 
-  <!-- ── WELLNESS TIPS ──────────────────────────────────── -->
-  <section class="card tips-card">
-    <h3 class="card-title">💡 Wellness Tips</h3>
-    <div id="tipsList" class="tips-list">
-      <div class="tip-item active">👀 Follow the 20-20-20 rule: every 20 min, look 20 ft away for 20 sec.</div>
-      <div class="tip-item">💧 Stay hydrated — dehydration is a major migraine trigger.</div>
-      <div class="tip-item">🌙 Maintain a consistent sleep schedule.</div>
-      <div class="tip-item">🌡 Keep screen brightness ≤ 70% in dark environments.</div>
-      <div class="tip-item">🧘 Short breathing exercises reduce tension headaches.</div>
-      <div class="tip-item">🍵 Limit caffeine to 1-2 cups per day.</div>
-    </div>
-    <div class="tip-nav">
-      <button onclick="prevTip()">◀</button>
-      <span id="tipCounter">1 / 6</span>
-      <button onclick="nextTip()">▶</button>
-    </div>
-  </section>
+  </div>
+</div><!-- /tab-history -->
 
-</main>
 
-<!-- ── FOOTER ─────────────────────────────────────────── -->
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
 <footer class="footer">
-  <span>MigraineSense v1.0 — Passive Early-Warning System</span>
+  <span>MigraineSense v2.0 — Passive Early-Warning + Helmet Therapy System</span>
   <span id="lastUpdate">Last update: —</span>
 </footer>
 
-<!-- Socket.IO: served locally via /assets/ (avoids Flask-SocketIO's reserved /socket.io/ prefix) -->
+<!-- Scripts -->
 <script src="/assets/socket.io.js"
-        onerror="
-          var s=document.createElement('script');
-          s.src='https://cdn.socket.io/4.7.2/socket.io.min.js';
-          document.body.appendChild(s);
-        "></script>
-<!-- Chart.js -->
+  onerror="var s=document.createElement('script');s.src='https://cdn.socket.io/4.7.2/socket.io.min.js';document.body.appendChild(s);">
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
-        onerror="
-          var s=document.createElement('script');
-          s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
-          document.body.appendChild(s);
-        "></script>
+  onerror="var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';document.body.appendChild(s);">
+</script>
 <script src="/static/js/dashboard.js"></script>
 </body>
 </html>

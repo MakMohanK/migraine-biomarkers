@@ -1,0 +1,233 @@
+{
+  "library_version": "1.0.0",
+  "description": "Pre-defined therapy protocols mapped to migraine type, phase, and pain score. System auto-selects the best match from user pre-filled form.",
+
+  "protocols": [
+
+    {
+      "protocol_id": "PROTO-001",
+      "migraine_type": "tension",
+      "migraine_phase": "headache",
+      "pain_score_range": { "min": 1, "max": 4 },
+      "therapy_profile": "gentle",
+      "label": "Tension Headache — Mild",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true,  "technique": "EFFLEURAGE",        "intensity_level": 3, "pressure_kpa": 8.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "parietal_lobe":  { "enabled": true,  "technique": "CIRCULAR",          "intensity_level": 3, "pressure_kpa": 8.0,  "frequency_hz": 0.3, "cycle_pattern": { "on_seconds": 20, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "occipital_lobe": { "enabled": true,  "technique": "SUSTAINED_PRESSURE","intensity_level": 3, "pressure_kpa": 9.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 30, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "right_temporal": { "enabled": false, "technique": "EFFLEURAGE",        "intensity_level": 2, "pressure_kpa": 6.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 15, "off_seconds": 5,  "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 3, "ramp_down_seconds": 3 },
+        "left_temporal":  { "enabled": false, "technique": "EFFLEURAGE",        "intensity_level": 2, "pressure_kpa": 6.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 15, "off_seconds": 5,  "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 3, "ramp_down_seconds": 3 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true,  "mode": "HEAT", "target_temp_celsius": 38.0, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 2.0 },
+        "occipital_pad": { "enabled": true,  "mode": "HEAT", "target_temp_celsius": 38.0, "duration_seconds": 900,  "ramp_rate_celsius_per_min": 2.0 }
+      },
+      "total_duration_min": 20
+    },
+
+    {
+      "protocol_id": "PROTO-002",
+      "migraine_type": "tension",
+      "migraine_phase": "headache",
+      "pain_score_range": { "min": 5, "max": 10 },
+      "therapy_profile": "moderate",
+      "label": "Tension Headache — Severe",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true, "technique": "SUSTAINED_PRESSURE", "intensity_level": 6, "pressure_kpa": 18.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 30, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1800, "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "parietal_lobe":  { "enabled": true, "technique": "PETRISSAGE",         "intensity_level": 6, "pressure_kpa": 16.0, "frequency_hz": 0.5, "cycle_pattern": { "on_seconds": 25, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1800, "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "occipital_lobe": { "enabled": true, "technique": "TRIGGER_POINT",      "intensity_level": 7, "pressure_kpa": 22.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 45, "off_seconds": 15, "repeat_count": 15 }, "duration_seconds": 1200, "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "right_temporal": { "enabled": true, "technique": "RHYTHMIC_TAPPING",   "intensity_level": 4, "pressure_kpa": 10.0, "frequency_hz": 1.0, "cycle_pattern": { "on_seconds": 15, "off_seconds": 5,  "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 4, "ramp_down_seconds": 4 },
+        "left_temporal":  { "enabled": true, "technique": "RHYTHMIC_TAPPING",   "intensity_level": 4, "pressure_kpa": 10.0, "frequency_hz": 1.0, "cycle_pattern": { "on_seconds": 15, "off_seconds": 5,  "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 4, "ramp_down_seconds": 4 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true, "mode": "COLD", "target_temp_celsius": 14.0, "duration_seconds": 1800, "ramp_rate_celsius_per_min": 2.5 },
+        "occipital_pad": { "enabled": true, "mode": "HEAT", "target_temp_celsius": 39.0, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 2.0 }
+      },
+      "total_duration_min": 30
+    },
+
+    {
+      "protocol_id": "PROTO-003",
+      "migraine_type": "migraine_with_aura",
+      "migraine_phase": "aura",
+      "pain_score_range": { "min": 1, "max": 5 },
+      "therapy_profile": "gentle",
+      "label": "Migraine With Aura — Aura Phase",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true,  "technique": "SUSTAINED_PRESSURE", "intensity_level": 4, "pressure_kpa": 12.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 25, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 8, "ramp_down_seconds": 8 },
+        "parietal_lobe":  { "enabled": true,  "technique": "EFFLEURAGE",         "intensity_level": 3, "pressure_kpa": 8.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "occipital_lobe": { "enabled": true,  "technique": "CIRCULAR",           "intensity_level": 4, "pressure_kpa": 12.0, "frequency_hz": 0.3, "cycle_pattern": { "on_seconds": 20, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "right_temporal": { "enabled": false, "technique": "EFFLEURAGE",         "intensity_level": 2, "pressure_kpa": 5.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 4, "ramp_down_seconds": 4 },
+        "left_temporal":  { "enabled": false, "technique": "EFFLEURAGE",         "intensity_level": 2, "pressure_kpa": 5.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 4, "ramp_down_seconds": 4 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true,  "mode": "COLD", "target_temp_celsius": 16.0, "duration_seconds": 900,  "ramp_rate_celsius_per_min": 2.0 },
+        "occipital_pad": { "enabled": false, "mode": "OFF",  "target_temp_celsius": null,  "duration_seconds": 0,    "ramp_rate_celsius_per_min": 0   }
+      },
+      "total_duration_min": 15
+    },
+
+    {
+      "protocol_id": "PROTO-004",
+      "migraine_type": "migraine_with_aura",
+      "migraine_phase": "headache",
+      "pain_score_range": { "min": 6, "max": 10 },
+      "therapy_profile": "intensive",
+      "label": "Migraine With Aura — Peak Headache Phase",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true, "technique": "SUSTAINED_PRESSURE", "intensity_level": 7, "pressure_kpa": 22.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 40, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 2100, "ramp_up_seconds": 8,  "ramp_down_seconds": 8 },
+        "parietal_lobe":  { "enabled": true, "technique": "PETRISSAGE",         "intensity_level": 6, "pressure_kpa": 18.0, "frequency_hz": 0.6, "cycle_pattern": { "on_seconds": 30, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 2100, "ramp_up_seconds": 8,  "ramp_down_seconds": 8 },
+        "occipital_lobe": { "enabled": true, "technique": "TRIGGER_POINT",      "intensity_level": 8, "pressure_kpa": 26.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 60, "off_seconds": 20, "repeat_count": 20 }, "duration_seconds": 1600, "ramp_up_seconds": 8,  "ramp_down_seconds": 8 },
+        "right_temporal": { "enabled": true, "technique": "RHYTHMIC_TAPPING",   "intensity_level": 5, "pressure_kpa": 12.0, "frequency_hz": 1.5, "cycle_pattern": { "on_seconds": 20, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 5,  "ramp_down_seconds": 5 },
+        "left_temporal":  { "enabled": true, "technique": "RHYTHMIC_TAPPING",   "intensity_level": 5, "pressure_kpa": 12.0, "frequency_hz": 1.5, "cycle_pattern": { "on_seconds": 20, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 5,  "ramp_down_seconds": 5 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   {
+          "enabled": true, "mode": "COLD", "target_temp_celsius": 13.0, "duration_seconds": 2100, "ramp_rate_celsius_per_min": 3.0
+        },
+        "occipital_pad": {
+          "enabled": true,
+          "mode": "ALTERNATING",
+          "target_temp_celsius": null,
+          "duration_seconds": 1600,
+          "alternating_cycle": {
+            "heat_temp_celsius": 39.0,
+            "cold_temp_celsius": 13.0,
+            "heat_duration_seconds": 120,
+            "cold_duration_seconds": 90,
+            "repeat_count": 8
+          },
+          "ramp_rate_celsius_per_min": 3.0
+        }
+      },
+      "total_duration_min": 35
+    },
+
+    {
+      "protocol_id": "PROTO-005",
+      "migraine_type": "cluster",
+      "migraine_phase": "headache",
+      "pain_score_range": { "min": 7, "max": 10 },
+      "therapy_profile": "intensive",
+      "label": "Cluster Headache — Intensive",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true, "technique": "SUSTAINED_PRESSURE", "intensity_level": 8, "pressure_kpa": 25.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 50, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1800, "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "parietal_lobe":  { "enabled": true, "technique": "VIBRATION",          "intensity_level": 6, "pressure_kpa": 15.0, "frequency_hz": 2.0, "cycle_pattern": { "on_seconds": 30, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1800, "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "occipital_lobe": { "enabled": true, "technique": "TRIGGER_POINT",      "intensity_level": 8, "pressure_kpa": 26.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 60, "off_seconds": 20, "repeat_count": 20 }, "duration_seconds": 1800, "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "right_temporal": { "enabled": true, "technique": "SUSTAINED_PRESSURE", "intensity_level": 8, "pressure_kpa": 24.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 60, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 1800, "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "left_temporal":  { "enabled": true, "technique": "SUSTAINED_PRESSURE", "intensity_level": 8, "pressure_kpa": 24.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 60, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 1800, "ramp_up_seconds": 5, "ramp_down_seconds": 5 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true, "mode": "COLD", "target_temp_celsius": 12.0, "duration_seconds": 1800, "ramp_rate_celsius_per_min": 3.0 },
+        "occipital_pad": { "enabled": true, "mode": "COLD", "target_temp_celsius": 12.0, "duration_seconds": 1800, "ramp_rate_celsius_per_min": 3.0 }
+      },
+      "total_duration_min": 30
+    },
+
+    {
+      "protocol_id": "PROTO-006",
+      "migraine_type": "migraine_without_aura",
+      "migraine_phase": "headache",
+      "pain_score_range": { "min": 3, "max": 6 },
+      "therapy_profile": "moderate",
+      "label": "Migraine Without Aura — Moderate",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true, "technique": "CIRCULAR",           "intensity_level": 5, "pressure_kpa": 14.0, "frequency_hz": 0.4, "cycle_pattern": { "on_seconds": 25, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1500, "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "parietal_lobe":  { "enabled": true, "technique": "PETRISSAGE",         "intensity_level": 5, "pressure_kpa": 14.0, "frequency_hz": 0.5, "cycle_pattern": { "on_seconds": 25, "off_seconds": 10, "repeat_count": -1 }, "duration_seconds": 1500, "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "occipital_lobe": { "enabled": true, "technique": "TRIGGER_POINT",      "intensity_level": 6, "pressure_kpa": 18.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 40, "off_seconds": 15, "repeat_count": 15 }, "duration_seconds": 1200, "ramp_up_seconds": 6, "ramp_down_seconds": 6 },
+        "right_temporal": { "enabled": true, "technique": "RHYTHMIC_TAPPING",   "intensity_level": 4, "pressure_kpa": 10.0, "frequency_hz": 1.0, "cycle_pattern": { "on_seconds": 15, "off_seconds": 5,  "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 4, "ramp_down_seconds": 4 },
+        "left_temporal":  { "enabled": true, "technique": "RHYTHMIC_TAPPING",   "intensity_level": 4, "pressure_kpa": 10.0, "frequency_hz": 1.0, "cycle_pattern": { "on_seconds": 15, "off_seconds": 5,  "repeat_count": -1 }, "duration_seconds": 900,  "ramp_up_seconds": 4, "ramp_down_seconds": 4 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true,  "mode": "COLD", "target_temp_celsius": 15.0, "duration_seconds": 1500, "ramp_rate_celsius_per_min": 2.0 },
+        "occipital_pad": { "enabled": true,  "mode": "HEAT", "target_temp_celsius": 38.5, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 2.0 }
+      },
+      "total_duration_min": 25
+    },
+
+    {
+      "protocol_id": "PROTO-007",
+      "migraine_type": "vestibular",
+      "migraine_phase": "headache",
+      "pain_score_range": { "min": 1, "max": 10 },
+      "therapy_profile": "gentle",
+      "label": "Vestibular Migraine — Gentle Stabilisation",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true,  "technique": "SUSTAINED_PRESSURE", "intensity_level": 3, "pressure_kpa": 8.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 30, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 10, "ramp_down_seconds": 10 },
+        "parietal_lobe":  { "enabled": true,  "technique": "EFFLEURAGE",         "intensity_level": 2, "pressure_kpa": 6.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 10, "ramp_down_seconds": 10 },
+        "occipital_lobe": { "enabled": true,  "technique": "EFFLEURAGE",         "intensity_level": 3, "pressure_kpa": 8.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 25, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 10, "ramp_down_seconds": 10 },
+        "right_temporal": { "enabled": false, "technique": "EFFLEURAGE",         "intensity_level": 1, "pressure_kpa": 4.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 8,  "ramp_down_seconds": 8  },
+        "left_temporal":  { "enabled": false, "technique": "EFFLEURAGE",         "intensity_level": 1, "pressure_kpa": 4.0,  "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 8,  "ramp_down_seconds": 8  }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true, "mode": "COLD", "target_temp_celsius": 18.0, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 1.5 },
+        "occipital_pad": { "enabled": true, "mode": "HEAT", "target_temp_celsius": 37.5, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 1.5 }
+      },
+      "total_duration_min": 20
+    },
+
+    {
+      "protocol_id": "PROTO-008",
+      "migraine_type": "hemiplegic",
+      "migraine_phase": "headache",
+      "pain_score_range": { "min": 1, "max": 10 },
+      "therapy_profile": "gentle",
+      "label": "Hemiplegic Migraine — Ultra Gentle (Caution Mode)",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true,  "technique": "EFFLEURAGE",         "intensity_level": 2, "pressure_kpa": 5.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 900, "ramp_up_seconds": 15, "ramp_down_seconds": 15 },
+        "parietal_lobe":  { "enabled": true,  "technique": "EFFLEURAGE",         "intensity_level": 2, "pressure_kpa": 5.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 900, "ramp_up_seconds": 15, "ramp_down_seconds": 15 },
+        "occipital_lobe": { "enabled": true,  "technique": "SUSTAINED_PRESSURE", "intensity_level": 2, "pressure_kpa": 6.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 25, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 900, "ramp_up_seconds": 15, "ramp_down_seconds": 15 },
+        "right_temporal": { "enabled": false, "technique": "EFFLEURAGE",         "intensity_level": 1, "pressure_kpa": 3.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 600, "ramp_up_seconds": 10, "ramp_down_seconds": 10 },
+        "left_temporal":  { "enabled": false, "technique": "EFFLEURAGE",         "intensity_level": 1, "pressure_kpa": 3.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 600, "ramp_up_seconds": 10, "ramp_down_seconds": 10 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true,  "mode": "COLD", "target_temp_celsius": 18.0, "duration_seconds": 900, "ramp_rate_celsius_per_min": 1.0 },
+        "occipital_pad": { "enabled": false, "mode": "OFF",  "target_temp_celsius": null,  "duration_seconds": 0,   "ramp_rate_celsius_per_min": 0   }
+      },
+      "total_duration_min": 15
+    },
+
+    {
+      "protocol_id": "PROTO-009",
+      "migraine_type": "any",
+      "migraine_phase": "prodrome",
+      "pain_score_range": { "min": 1, "max": 4 },
+      "therapy_profile": "gentle",
+      "label": "Prodrome Preventive — Early Intervention",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true,  "technique": "CIRCULAR",    "intensity_level": 2, "pressure_kpa": 6.0, "frequency_hz": 0.3, "cycle_pattern": { "on_seconds": 15, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 900, "ramp_up_seconds": 8, "ramp_down_seconds": 8 },
+        "parietal_lobe":  { "enabled": true,  "technique": "EFFLEURAGE",  "intensity_level": 2, "pressure_kpa": 5.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 15, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 900, "ramp_up_seconds": 8, "ramp_down_seconds": 8 },
+        "occipital_lobe": { "enabled": true,  "technique": "EFFLEURAGE",  "intensity_level": 2, "pressure_kpa": 6.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 15, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 900, "ramp_up_seconds": 8, "ramp_down_seconds": 8 },
+        "right_temporal": { "enabled": false, "technique": "EFFLEURAGE",  "intensity_level": 1, "pressure_kpa": 3.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 600, "ramp_up_seconds": 5, "ramp_down_seconds": 5 },
+        "left_temporal":  { "enabled": false, "technique": "EFFLEURAGE",  "intensity_level": 1, "pressure_kpa": 3.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 15, "repeat_count": -1 }, "duration_seconds": 600, "ramp_up_seconds": 5, "ramp_down_seconds": 5 }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true,  "mode": "COLD", "target_temp_celsius": 18.0, "duration_seconds": 900, "ramp_rate_celsius_per_min": 1.5 },
+        "occipital_pad": { "enabled": false, "mode": "OFF",  "target_temp_celsius": null,  "duration_seconds": 0,   "ramp_rate_celsius_per_min": 0   }
+      },
+      "total_duration_min": 15
+    },
+
+    {
+      "protocol_id": "PROTO-010",
+      "migraine_type": "any",
+      "migraine_phase": "postdrome",
+      "pain_score_range": { "min": 1, "max": 3 },
+      "therapy_profile": "gentle",
+      "label": "Postdrome Recovery — Gentle Relaxation",
+      "actuators": {
+        "frontal_lobe":   { "enabled": true,  "technique": "EFFLEURAGE",  "intensity_level": 1, "pressure_kpa": 4.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 10, "ramp_down_seconds": 10 },
+        "parietal_lobe":  { "enabled": true,  "technique": "EFFLEURAGE",  "intensity_level": 1, "pressure_kpa": 4.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 10, "ramp_down_seconds": 10 },
+        "occipital_lobe": { "enabled": true,  "technique": "EFFLEURAGE",  "intensity_level": 1, "pressure_kpa": 4.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 20, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 1200, "ramp_up_seconds": 10, "ramp_down_seconds": 10 },
+        "right_temporal": { "enabled": false, "technique": "EFFLEURAGE",  "intensity_level": 1, "pressure_kpa": 3.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 8,  "ramp_down_seconds": 8  },
+        "left_temporal":  { "enabled": false, "technique": "EFFLEURAGE",  "intensity_level": 1, "pressure_kpa": 3.0, "frequency_hz": 0,   "cycle_pattern": { "on_seconds": 10, "off_seconds": 20, "repeat_count": -1 }, "duration_seconds": 600,  "ramp_up_seconds": 8,  "ramp_down_seconds": 8  }
+      },
+      "temperature_pads": {
+        "frontal_pad":   { "enabled": true, "mode": "HEAT", "target_temp_celsius": 37.0, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 1.0 },
+        "occipital_pad": { "enabled": true, "mode": "HEAT", "target_temp_celsius": 37.0, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 1.0 }
+      },
+      "total_duration_min": 20
+    }
+
+  ]
+}

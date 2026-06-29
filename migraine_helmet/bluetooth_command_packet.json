@@ -1,0 +1,263 @@
+{
+  "packet_spec_version": "1.0.0",
+  "description": "Bluetooth HC-05 serial command packet specification for the Migraine Therapy Helmet. Each packet is serialized to JSON string and sent over UART serial at 9600 baud.",
+  "transport": {
+    "module": "HC-05",
+    "baud_rate": 9600,
+    "data_bits": 8,
+    "stop_bits": 1,
+    "parity": "NONE",
+    "encoding": "UTF-8",
+    "line_terminator": "\\r\\n",
+    "max_packet_size_bytes": 512
+  },
+
+  "command_types": {
+
+    "CMD_HANDSHAKE": {
+      "code": "0x01",
+      "description": "Initiate connection and verify device identity",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_HANDSHAKE",
+        "host_id": "MIGRAINE_APP_V1",
+        "timestamp": "ISO8601"
+      },
+      "expected_ack": {
+        "status": "ACK",
+        "device_id": "HELMET_001",
+        "firmware_version": "string",
+        "battery_percent": "integer"
+      }
+    },
+
+    "CMD_LOAD_SESSION": {
+      "code": "0x02",
+      "description": "Send full therapy session JSON to device memory",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_LOAD_SESSION",
+        "session_id": "string",
+        "patient_id": "string",
+        "therapy_profile": "gentle | moderate | intensive | custom",
+        "total_duration_min": "integer"
+      },
+      "expected_ack": {
+        "status": "ACK | NACK",
+        "session_id": "string",
+        "message": "string"
+      }
+    },
+
+    "CMD_ACTUATOR_SET": {
+      "code": "0x03",
+      "description": "Set parameters for one or all actuators",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_ACTUATOR_SET",
+        "zone": "frontal_lobe | parietal_lobe | occipital_lobe | right_temporal | left_temporal | ALL",
+        "enabled": "boolean",
+        "technique": "SUSTAINED_PRESSURE | CIRCULAR | RHYTHMIC_TAPPING | VIBRATION | PETRISSAGE | EFFLEURAGE | TRIGGER_POINT",
+        "intensity_level": "0–10",
+        "pressure_kpa": "float",
+        "frequency_hz": "float",
+        "on_seconds": "float",
+        "off_seconds": "float",
+        "duration_seconds": "integer",
+        "ramp_up_seconds": "float",
+        "ramp_down_seconds": "float"
+      },
+      "expected_ack": {
+        "status": "ACK | NACK",
+        "zone": "string",
+        "message": "string"
+      }
+    },
+
+    "CMD_TEMP_PAD_SET": {
+      "code": "0x04",
+      "description": "Set parameters for a temperature pad",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_TEMP_PAD_SET",
+        "pad": "frontal_pad | occipital_pad",
+        "enabled": "boolean",
+        "mode": "HEAT | COLD | ALTERNATING | OFF",
+        "target_temp_celsius": "float",
+        "duration_seconds": "integer",
+        "ramp_rate_celsius_per_min": "float",
+        "alternating_cycle": {
+          "heat_temp_celsius": "float",
+          "cold_temp_celsius": "float",
+          "heat_duration_seconds": "integer",
+          "cold_duration_seconds": "integer",
+          "repeat_count": "integer"
+        }
+      },
+      "expected_ack": {
+        "status": "ACK | NACK",
+        "pad": "string",
+        "message": "string"
+      }
+    },
+
+    "CMD_START_THERAPY": {
+      "code": "0x05",
+      "description": "Start the loaded therapy session",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_START_THERAPY",
+        "session_id": "string"
+      },
+      "expected_ack": {
+        "status": "ACK | NACK",
+        "session_id": "string",
+        "started_at": "ISO8601",
+        "message": "string"
+      }
+    },
+
+    "CMD_PAUSE_THERAPY": {
+      "code": "0x06",
+      "description": "Pause an active therapy session",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_PAUSE_THERAPY",
+        "session_id": "string"
+      },
+      "expected_ack": {
+        "status": "ACK | NACK",
+        "elapsed_seconds": "integer",
+        "message": "string"
+      }
+    },
+
+    "CMD_RESUME_THERAPY": {
+      "code": "0x07",
+      "description": "Resume a paused therapy session",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_RESUME_THERAPY",
+        "session_id": "string"
+      },
+      "expected_ack": {
+        "status": "ACK | NACK",
+        "remaining_seconds": "integer",
+        "message": "string"
+      }
+    },
+
+    "CMD_STOP_THERAPY": {
+      "code": "0x08",
+      "description": "Gracefully stop and reset all actuators and pads",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_STOP_THERAPY",
+        "session_id": "string",
+        "reason": "USER_STOP | COMPLETED | EMERGENCY"
+      },
+      "expected_ack": {
+        "status": "ACK",
+        "session_id": "string",
+        "total_elapsed_seconds": "integer",
+        "message": "string"
+      }
+    },
+
+    "CMD_STATUS_REQUEST": {
+      "code": "0x09",
+      "description": "Request real-time device and session status",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_STATUS_REQUEST"
+      },
+      "expected_response": {
+        "status": "IDLE | RUNNING | PAUSED | ERROR",
+        "session_id": "string",
+        "elapsed_seconds": "integer",
+        "remaining_seconds": "integer",
+        "current_phase": "string",
+        "battery_percent": "integer",
+        "actuators": {
+          "frontal_lobe":   { "active": "boolean", "current_pressure_kpa": "float", "technique": "string" },
+          "parietal_lobe":  { "active": "boolean", "current_pressure_kpa": "float", "technique": "string" },
+          "occipital_lobe": { "active": "boolean", "current_pressure_kpa": "float", "technique": "string" },
+          "right_temporal": { "active": "boolean", "current_pressure_kpa": "float", "technique": "string" },
+          "left_temporal":  { "active": "boolean", "current_pressure_kpa": "float", "technique": "string" }
+        },
+        "temperature_pads": {
+          "frontal_pad":   { "active": "boolean", "current_temp_celsius": "float", "mode": "string" },
+          "occipital_pad": { "active": "boolean", "current_temp_celsius": "float", "mode": "string" }
+        }
+      }
+    },
+
+    "CMD_EMERGENCY_STOP": {
+      "code": "0xFF",
+      "description": "Immediately cut power to all actuators and pads — no ramp down",
+      "direction": "HOST → DEVICE",
+      "payload": {
+        "cmd": "CMD_EMERGENCY_STOP",
+        "code": "ESTOP::0xFF"
+      },
+      "expected_ack": {
+        "status": "ACK",
+        "message": "ALL_ZONES_OFF"
+      }
+    }
+
+  },
+
+  "example_sequence": [
+    {
+      "step": 1,
+      "description": "Handshake with device",
+      "packet": { "cmd": "CMD_HANDSHAKE", "host_id": "MIGRAINE_APP_V1", "timestamp": "2024-06-15T14:32:00Z" }
+    },
+    {
+      "step": 2,
+      "description": "Load session metadata to device",
+      "packet": { "cmd": "CMD_LOAD_SESSION", "session_id": "SESSION-20240615-00472", "patient_id": "PAT-00123", "therapy_profile": "moderate", "total_duration_min": 30 }
+    },
+    {
+      "step": 3,
+      "description": "Set frontal lobe actuator",
+      "packet": { "cmd": "CMD_ACTUATOR_SET", "zone": "frontal_lobe", "enabled": true, "technique": "SUSTAINED_PRESSURE", "intensity_level": 6, "pressure_kpa": 18.5, "frequency_hz": 0, "on_seconds": 30, "off_seconds": 10, "duration_seconds": 1800, "ramp_up_seconds": 5, "ramp_down_seconds": 5 }
+    },
+    {
+      "step": 4,
+      "description": "Set parietal lobe actuator",
+      "packet": { "cmd": "CMD_ACTUATOR_SET", "zone": "parietal_lobe", "enabled": true, "technique": "CIRCULAR", "intensity_level": 5, "pressure_kpa": 14.0, "frequency_hz": 0.5, "on_seconds": 20, "off_seconds": 10, "duration_seconds": 1800, "ramp_up_seconds": 8, "ramp_down_seconds": 8 }
+    },
+    {
+      "step": 5,
+      "description": "Set occipital lobe actuator",
+      "packet": { "cmd": "CMD_ACTUATOR_SET", "zone": "occipital_lobe", "enabled": true, "technique": "TRIGGER_POINT", "intensity_level": 7, "pressure_kpa": 22.0, "frequency_hz": 0, "on_seconds": 45, "off_seconds": 15, "duration_seconds": 1200, "ramp_up_seconds": 6, "ramp_down_seconds": 6 }
+    },
+    {
+      "step": 6,
+      "description": "Set right temporal actuator",
+      "packet": { "cmd": "CMD_ACTUATOR_SET", "zone": "right_temporal", "enabled": true, "technique": "RHYTHMIC_TAPPING", "intensity_level": 4, "pressure_kpa": 10.0, "frequency_hz": 1.2, "on_seconds": 15, "off_seconds": 5, "duration_seconds": 900, "ramp_up_seconds": 4, "ramp_down_seconds": 4 }
+    },
+    {
+      "step": 7,
+      "description": "Set left temporal actuator",
+      "packet": { "cmd": "CMD_ACTUATOR_SET", "zone": "left_temporal", "enabled": true, "technique": "RHYTHMIC_TAPPING", "intensity_level": 4, "pressure_kpa": 10.0, "frequency_hz": 1.2, "on_seconds": 15, "off_seconds": 5, "duration_seconds": 900, "ramp_up_seconds": 4, "ramp_down_seconds": 4 }
+    },
+    {
+      "step": 8,
+      "description": "Set frontal temperature pad — cold therapy",
+      "packet": { "cmd": "CMD_TEMP_PAD_SET", "pad": "frontal_pad", "enabled": true, "mode": "COLD", "target_temp_celsius": 15.0, "duration_seconds": 1800, "ramp_rate_celsius_per_min": 2.0 }
+    },
+    {
+      "step": 9,
+      "description": "Set occipital temperature pad — alternating",
+      "packet": { "cmd": "CMD_TEMP_PAD_SET", "pad": "occipital_pad", "enabled": true, "mode": "ALTERNATING", "target_temp_celsius": null, "duration_seconds": 1200, "ramp_rate_celsius_per_min": 3.0, "alternating_cycle": { "heat_temp_celsius": 38.5, "cold_temp_celsius": 14.0, "heat_duration_seconds": 120, "cold_duration_seconds": 90, "repeat_count": 6 } }
+    },
+    {
+      "step": 10,
+      "description": "Start the therapy session",
+      "packet": { "cmd": "CMD_START_THERAPY", "session_id": "SESSION-20240615-00472" }
+    }
+  ]
+}

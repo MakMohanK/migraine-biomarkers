@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MigraineHelmetTherapySchema",
+  "description": "Schema defining the therapy payload sent to the digital migraine helmet device via Bluetooth (HC-05)",
+  "type": "object",
+  "properties": {
+    "session": {
+      "type": "object",
+      "description": "Top-level session metadata",
+      "properties": {
+        "session_id":       { "type": "string" },
+        "patient_id":       { "type": "string" },
+        "created_at":       { "type": "string", "format": "date-time" },
+        "migraine_phase":   { "type": "string", "enum": ["prodrome","aura","headache","postdrome"] },
+        "migraine_type":    { "type": "string", "enum": ["tension","cluster","migraine_with_aura","migraine_without_aura","hemiplegic","vestibular"] },
+        "pain_score":       { "type": "integer", "minimum": 0, "maximum": 10 },
+        "therapy_profile":  { "type": "string", "enum": ["gentle","moderate","intensive","custom"] },
+        "total_duration_min":{ "type": "integer", "minimum": 1, "maximum": 120 },
+        "bluetooth_device": { "type": "string", "description": "HC-05 MAC address or device name" }
+      },
+      "required": ["session_id","patient_id","created_at","migraine_phase","migraine_type","pain_score","therapy_profile","total_duration_min"]
+    },
+
+    "actuators": {
+      "type": "object",
+      "description": "5 pressure actuator zones on the helmet",
+      "properties": {
+        "frontal_lobe":    { "$ref": "#/definitions/actuator_config" },
+        "parietal_lobe":   { "$ref": "#/definitions/actuator_config" },
+        "occipital_lobe":  { "$ref": "#/definitions/actuator_config" },
+        "right_temporal":  { "$ref": "#/definitions/actuator_config" },
+        "left_temporal":   { "$ref": "#/definitions/actuator_config" }
+      },
+      "required": ["frontal_lobe","parietal_lobe","occipital_lobe","right_temporal","left_temporal"]
+    },
+
+    "temperature_pads": {
+      "type": "object",
+      "description": "Heat/cold therapy pads on frontal and occipital zones",
+      "properties": {
+        "frontal_pad":   { "$ref": "#/definitions/temp_pad_config" },
+        "occipital_pad": { "$ref": "#/definitions/temp_pad_config" }
+      },
+      "required": ["frontal_pad","occipital_pad"]
+    },
+
+    "therapy_sequence": {
+      "type": "array",
+      "description": "Ordered list of therapy phases executed in sequence",
+      "items": { "$ref": "#/definitions/therapy_phase" }
+    },
+
+    "safety": {
+      "type": "object",
+      "description": "Safety thresholds and emergency stop conditions",
+      "properties": {
+        "max_pressure_kpa":       { "type": "number" },
+        "max_temp_celsius":       { "type": "number" },
+        "min_temp_celsius":       { "type": "number" },
+        "auto_stop_on_no_signal": { "type": "boolean" },
+        "session_pause_allowed":  { "type": "boolean" },
+        "emergency_stop_code":    { "type": "string" }
+      }
+    }
+  },
+
+  "definitions": {
+
+    "actuator_config": {
+      "type": "object",
+      "properties": {
+        "enabled":          { "type": "boolean" },
+        "technique":        {
+          "type": "string",
+          "enum": [
+            "SUSTAINED_PRESSURE",
+            "CIRCULAR",
+            "RHYTHMIC_TAPPING",
+            "VIBRATION",
+            "PETRISSAGE",
+            "EFFLEURAGE",
+            "TRIGGER_POINT"
+          ]
+        },
+        "intensity_level":  { "type": "integer", "minimum": 0, "maximum": 10, "description": "0=off, 1=very light, 10=maximum" },
+        "pressure_kpa":     { "type": "number", "description": "Actual pressure in kilopascals" },
+        "frequency_hz":     { "type": "number", "description": "Vibration/tapping frequency in Hz" },
+        "cycle_pattern": {
+          "type": "object",
+          "description": "ON/OFF duty cycle in seconds",
+          "properties": {
+            "on_seconds":   { "type": "number" },
+            "off_seconds":  { "type": "number" },
+            "repeat_count": { "type": "integer", "description": "-1 for continuous" }
+          }
+        },
+        "duration_seconds": { "type": "integer" },
+        "ramp_up_seconds":  { "type": "number", "description": "Gradual increase time to target pressure" },
+        "ramp_down_seconds":{ "type": "number", "description": "Gradual release time after therapy" },
+        "notes":            { "type": "string" }
+      },
+      "required": ["enabled","technique","intensity_level","duration_seconds"]
+    },
+
+    "temp_pad_config": {
+      "type": "object",
+      "properties": {
+        "enabled":          { "type": "boolean" },
+        "mode":             { "type": "string", "enum": ["HEAT","COLD","ALTERNATING","OFF"] },
+        "target_temp_celsius": { "type": "number" },
+        "duration_seconds": { "type": "integer" },
+        "alternating_cycle": {
+          "type": "object",
+          "description": "Used only when mode = ALTERNATING",
+          "properties": {
+            "heat_temp_celsius":    { "type": "number" },
+            "cold_temp_celsius":    { "type": "number" },
+            "heat_duration_seconds":{ "type": "integer" },
+            "cold_duration_seconds":{ "type": "integer" },
+            "repeat_count":         { "type": "integer" }
+          }
+        },
+        "ramp_rate_celsius_per_min":{ "type": "number" },
+        "notes": { "type": "string" }
+      },
+      "required": ["enabled","mode","duration_seconds"]
+    },
+
+    "therapy_phase": {
+      "type": "object",
+      "description": "A single named phase in the therapy sequence",
+      "properties": {
+        "phase_name":       { "type": "string" },
+        "phase_order":      { "type": "integer" },
+        "duration_seconds": { "type": "integer" },
+        "active_zones":     {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["frontal_lobe","parietal_lobe","occipital_lobe","right_temporal","left_temporal","frontal_pad","occipital_pad"]
+          }
+        },
+        "override_intensity": { "type": "integer", "minimum": 0, "maximum": 10, "description": "Override all zone intensities for this phase" }
+      },
+      "required": ["phase_name","phase_order","duration_seconds","active_zones"]
+    }
+  }
+}
