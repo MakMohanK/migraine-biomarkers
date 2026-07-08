@@ -1,0 +1,10 @@
+currantly what we have.
+we have digital biomarker - algorithem to predict estimated time of migrane arrival.
+what we wanted to do now-  post phase becually we wanted to have a kind of solution if person is having migrane he should fill pre-populated form and then a digital helmet will start therapy according to data prefilled by the user
+the device will be connecting to this solution via bluetooth (HC-05 to laptop) and then based on prefilled information extract the type of therapy, intensity and type of massage tequnic that perticular person needed, feed the same data to device so that device will start the massage.
+
+details of the device.
+the device will have 5 actuator that will apply pressure on (covering frontal lobe, pariatel lobe, occipital lobe, near to right ear, near to left ear)
+temrature pads for heat and cold therapy (connected to frontal lobe and occipital lobe)
+
+for the same device generate a json for massage therapy details so that device will act upone same.
