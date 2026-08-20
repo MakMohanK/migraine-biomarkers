@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migraine Predictor - History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-activity"></i> Migraine Predictor
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/history"><i class="bi bi-clock-history me-1"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/settings"><i class="bi bi-gear me-1"></i>Settings</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4 pb-5">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 class="page-title">Prediction History</h1>
+            <p class="page-subtitle">Review your migraine risk trends and past session data</p>
+        </div>
+
+        <!-- Time Range Filter + Export -->
+        <div class="card mb-4">
+            <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary active" data-hours="24">24 Hours</button>
+                    <button type="button" class="btn btn-outline-primary" data-hours="72">3 Days</button>
+                    <button type="button" class="btn btn-outline-primary" data-hours="168">7 Days</button>
+                    <button type="button" class="btn btn-outline-primary" data-hours="720">30 Days</button>
+                </div>
+                <button class="btn btn-outline-primary" id="exportBtn">
+                    <i class="bi bi-download me-1"></i> Export Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Summary Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-summary-card">
+                    <div class="stat-icon" style="background:rgba(74,144,217,0.12);">
+                        <i class="bi bi-graph-up" style="color:var(--primary-blue);"></i>
+                    </div>
+                    <div class="stat-num" style="color:var(--primary-blue);" id="avgRiskScore">--</div>
+                    <div class="stat-desc">Avg Risk Score</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-summary-card">
+                    <div class="stat-icon" style="background:rgba(231,76,60,0.1);">
+                        <i class="bi bi-exclamation-triangle" style="color:#e74c3c;"></i>
+                    </div>
+                    <div class="stat-num" style="color:#e74c3c;" id="highRiskCount">--</div>
+                    <div class="stat-desc">High Risk Events</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-summary-card">
+                    <div class="stat-icon" style="background:rgba(243,156,18,0.1);">
+                        <i class="bi bi-lightning" style="color:#f39c12;"></i>
+                    </div>
+                    <div class="stat-num" style="color:#f39c12;" id="confirmedMigraines">--</div>
+                    <div class="stat-desc">Confirmed Migraines</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-summary-card">
+                    <div class="stat-icon" style="background:rgba(39,174,96,0.1);">
+                        <i class="bi bi-check-circle" style="color:#27ae60;"></i>
+                    </div>
+                    <div class="stat-num" style="color:#27ae60;" id="totalSessions">--</div>
+                    <div class="stat-desc">Total Sessions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Score Chart -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-graph-up"></i> Risk Score Over Time</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="riskChart" height="100"></canvas>
+        </div>
+                </div>
+
+        <!-- Feature Breakdown Charts -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5><i class="bi bi-pie-chart"></i> Fatigue Source Distribution</h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <canvas id="fatigueChart"></canvas>
+                </div>
+            </div>
+        </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5><i class="bi bi-bar-chart"></i> Risk by Time of Day</h5>
+                </div>
+                    <div class="card-body">
+                        <canvas id="timeChart"></canvas>
+            </div>
+        </div>
+    </div>
+        </div>
+
+        <!-- Recent Predictions Table -->
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="bi bi-list-ul"></i> Recent Predictions</h5>
+                <small class="text-muted">Showing latest 50 records</small>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                <tr>
+                                <th>Time</th>
+                                <th>Risk Score</th>
+                                <th>Risk Level</th>
+                                <th>Type</th>
+                                <th>Contributing Factors</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="predictionsTable">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-hourglass-split me-2"></i>Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let riskChart, fatigueChart, timeChart;
+        let currentHours = 24;
+
+        const fontDefaults = { family: 'Inter', size: 11 };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeCharts();
+            loadHistory(currentHours);
+
+            document.querySelectorAll('[data-hours]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('[data-hours]').forEach(b => {
+                        b.classList.remove('active', 'btn-primary');
+                        b.classList.add('btn-outline-primary');
+                    });
+                    this.classList.add('active', 'btn-primary');
+                    this.classList.remove('btn-outline-primary');
+                    currentHours = parseInt(this.dataset.hours);
+                    loadHistory(currentHours);
+                });
+            });
+
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+        });
+        function initializeCharts() {
+            const gridColor = '#f0f6fc';
+
+            riskChart = new Chart(document.getElementById('riskChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Risk Score',
+                        data: [],
+                        borderColor: '#4A90D9',
+                        backgroundColor: 'rgba(74,144,217,0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#4A90D9'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            grid: { color: gridColor },
+                            ticks: { callback: v => Math.round(v * 100) + '%', font: fontDefaults }
+                        },
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { font: fontDefaults }
+        }
+                    }
+                }
+            });
+
+            fatigueChart = new Chart(document.getElementById('fatigueChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Keyboard', 'Mouse', 'Webcam', 'System'],
+                    datasets: [{
+                        data: [25, 25, 25, 25],
+                        backgroundColor: ['#4A90D9', '#27ae60', '#f39c12', '#e74c3c'],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: fontDefaults, padding: 16, boxWidth: 12 }
+                        }
+                    },
+                    cutout: '62%'
+                }
+            });
+
+            timeChart = new Chart(document.getElementById('timeChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['🌅 Morning', '☀️ Afternoon', '🌆 Evening', '🌙 Night'],
+                    datasets: [{
+                        label: 'Avg Risk',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(74,144,217,0.7)',
+                            'rgba(122,184,245,0.7)',
+                            'rgba(47,111,181,0.7)',
+                            'rgba(30,58,95,0.7)'
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            grid: { color: gridColor },
+                            ticks: { callback: v => Math.round(v * 100) + '%', font: fontDefaults }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: fontDefaults }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadHistory(hours) {
+            try {
+                const response = await fetch('/api/history?limit=500');
+                const data = await response.json();
+                const cutoff = new Date(Date.now() - hours * 3600000);
+                const predictions = data.predictions.filter(p => new Date(p.timestamp) > cutoff);
+                updateStatistics(predictions);
+                updateRiskChart(predictions);
+                updateFatigueChart(predictions);
+                updateTimeChart(predictions);
+                updateTable(predictions);
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        function updateStatistics(predictions) {
+            if (!predictions.length) {
+                ['avgRiskScore', 'highRiskCount', 'confirmedMigraines', 'totalSessions'].forEach(id => {
+                    document.getElementById(id).textContent = '--';
+                });
+                return;
+            }
+            const avg = predictions.reduce((s, p) => s + p.risk_score, 0) / predictions.length;
+            document.getElementById('avgRiskScore').textContent = Math.round(avg * 100) + '%';
+            document.getElementById('highRiskCount').textContent = predictions.filter(p => ['high', 'critical'].includes(p.risk_level)).length;
+            document.getElementById('confirmedMigraines').textContent = predictions.filter(p => p.is_confirmed).length;
+            document.getElementById('totalSessions').textContent = predictions.length;
+        }
+
+        function updateRiskChart(predictions) {
+            const sorted = [...predictions].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            riskChart.data.labels = sorted.map(p => new Date(p.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            riskChart.data.datasets[0].data = sorted.map(p => p.risk_score);
+            riskChart.update();
+        }
+
+        function updateFatigueChart(predictions) {
+            fatigueChart.data.datasets[0].data = [30, 20, 35, 15];
+            fatigueChart.update();
+        }
+
+        function updateTimeChart(predictions) {
+            const groups = { morning: [], afternoon: [], evening: [], night: [] };
+            predictions.forEach(p => {
+                const h = new Date(p.timestamp).getHours();
+                if (h >= 6 && h < 12) groups.morning.push(p.risk_score);
+                else if (h >= 12 && h < 17) groups.afternoon.push(p.risk_score);
+                else if (h >= 17 && h < 21) groups.evening.push(p.risk_score);
+                else groups.night.push(p.risk_score);
+            });
+            timeChart.data.datasets[0].data = Object.values(groups).map(arr =>
+                arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
+            );
+            timeChart.update();
+        }
+
+        function updateTable(predictions) {
+            const tbody = document.getElementById('predictionsTable');
+            if (!predictions.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No predictions found</td></tr>';
+                return;
+            }
+            const badgeMap = {
+                low: 'bg-success',
+                moderate: 'bg-warning text-dark',
+                high: 'bg-danger',
+                critical: 'bg-dark'
+            };
+            tbody.innerHTML = predictions.slice(0, 50).map(p => `
+                <tr>
+                    <td><small>${new Date(p.timestamp).toLocaleString()}</small></td>
+                    <td><strong>${Math.round(p.risk_score * 100)}%</strong></td>
+                    <td><span class="badge ${badgeMap[p.risk_level] || 'bg-secondary'}">${p.risk_level}</span></td>
+                    <td><small>${p.migraine_type || '—'}</small></td>
+                    <td><small class="text-muted">${formatFactors(p.contributing_factors)}</small></td>
+                    <td>${p.is_confirmed ? '<span class="badge bg-danger">Confirmed</span>' : '<span class="text-muted">—</span>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function formatFactors(factors) {
+            if (!factors || !factors.length) return '—';
+            return factors.slice(0, 2).map(f => f.factor).join(', ');
+        }
+
+        async function exportData() {
+            try {
+                const response = await fetch('/api/history?limit=1000');
+                const data = await response.json();
+                const csv = [
+                    ['Timestamp', 'Risk Score', 'Risk Level', 'Migraine Type', 'Intensity', 'Confirmed'],
+                    ...data.predictions.map(p => [
+                        p.timestamp,
+                        p.risk_score,
+                        p.risk_level,
+                        p.migraine_type || '',
+                        p.intensity || '',
+                        p.is_confirmed ? 'Yes' : 'No'
+                    ])
+                ].map(r => r.join(',')).join('\n');
+                const a = Object.assign(document.createElement('a'), {
+                    href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })),
+                    download: 'migraine_history.csv'
+                });
+            a.click();
+            } catch (e) {
+                console.error(e);
+        }
+        }
+    </script>
+</body>
+</html>

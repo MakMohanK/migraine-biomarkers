@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migraine Predictor - Detailed Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-activity"></i> Migraine Predictor
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/history"><i class="bi bi-clock-history me-1"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/settings"><i class="bi bi-gear me-1"></i>Settings</a></li>
+                </ul>
+                <div class="live-badge" id="liveIndicator">
+                    <span class="live-dot"></span> Live
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-4 mt-4 pb-5">
+
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 class="page-title">Detailed Dashboard</h1>
+            <p class="page-subtitle">Live charts and metrics from all monitoring sources</p>
+        </div>
+
+        <!-- Notification Permission Banner -->
+        <div id="notifPermissionBanner" class="notif-permission-banner d-none mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <span style="font-size:1.6rem;">🔔</span>
+                <div class="flex-grow-1">
+                    <div class="fw-bold" style="font-size:0.92rem;">Enable Desktop Notifications</div>
+                    <small class="text-muted">Get instant OS-level alerts when your migraine risk rises sharply &mdash; even when this tab is in the background.</small>
+                </div>
+                <div class="d-flex gap-2 flex-shrink-0">
+                    <button class="btn btn-primary btn-sm" onclick="askNotificationPermission()">
+                        <i class="bi bi-bell-fill me-1"></i> Enable Alerts
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="dismissNotifBanner()">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Blocked Banner -->
+        <div id="notifBlockedBanner" class="notif-blocked-banner d-none mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <span style="font-size:1.6rem;">🔕</span>
+                <div class="flex-grow-1">
+                    <div class="fw-bold" style="font-size:0.92rem;">Desktop Notifications are Blocked</div>
+                    <small>To receive migraine risk alerts, click the 🔒 lock icon in your browser&apos;s address bar &rarr; <strong>Notifications</strong> &rarr; <strong>Allow</strong>, then reload the page.</small>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm flex-shrink-0"
+                        onclick="document.getElementById('notifBlockedBanner').classList.add('d-none')">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-lg-8">
+
+                <!-- Real-time Risk Chart -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="bi bi-graph-up"></i> Real-time Risk Score</h5>
+                        <span class="live-badge" id="liveIndicatorCard">
+                            <span class="live-dot"></span> Live
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="realtimeRiskChart" height="80"></canvas>
+                    </div>
+                </div>
+
+                <!-- Feature Breakdown Charts -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6><i class="bi bi-keyboard"></i> Keyboard Metrics</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="keyboardChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6><i class="bi bi-mouse" style="color:#27ae60"></i> Mouse Metrics</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="mouseChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6><i class="bi bi-eye" style="color:#f39c12"></i> Eye / Face Metrics</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="webcamChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6><i class="bi bi-cpu" style="color:#e74c3c"></i> System Metrics</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="systemChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-4">
+
+                <!-- Current Risk Score Card -->
+                <div class="card mb-4 risk-card" id="currentRiskCard">
+                    <div class="card-body text-center py-4 position-relative">
+                        <p class="mb-2" style="color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;">
+                            Current Risk Level
+                        </p>
+                        <div class="display-1 fw-bold" id="currentRiskScore">0%</div>
+                        <h4 class="mt-1" id="currentRiskLevel">Low Risk</h4>
+                        <div class="mt-3 d-none" id="migraineTypeDisplay">
+                            <span class="badge bg-light text-dark px-3 py-2" id="migraineTypeBadge">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Metrics -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="bi bi-speedometer2"></i> Detailed Metrics</h6>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- Keyboard -->
+                        <div class="metric-group mb-3">
+                            <h6>Keyboard</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Typing Speed</span><strong id="metricTypingSpeed">-- kpm</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Error Rate</span><strong id="metricErrorRate">--%</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Rhythm Score</span><strong id="metricRhythm">--</strong>
+                            </div>
+                        </div>
+
+                        <div style="border-top:1px solid #f0f6fc;" class="my-3"></div>
+
+                        <!-- Mouse -->
+                        <div class="metric-group mb-3">
+                            <h6>Mouse</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Movement Speed</span><strong id="metricMouseSpeed">-- px/s</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Click Rate</span><strong id="metricClickRate">-- /min</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Jitter Count</span><strong id="metricJitter">--</strong>
+                            </div>
+                        </div>
+
+                        <div style="border-top:1px solid #f0f6fc;" class="my-3"></div>
+
+                        <!-- Webcam -->
+                        <div class="metric-group mb-3">
+                            <h6>Webcam</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Blink Rate</span><strong id="metricBlinkRate">-- /min</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Eye Openness</span><strong id="metricEyeOpenness">--%</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Face Distance</span><strong id="metricFaceDistance">-- cm</strong>
+                            </div>
+                        </div>
+
+                        <div style="border-top:1px solid #f0f6fc;" class="my-3"></div>
+
+                        <!-- System -->
+                        <div class="metric-group">
+                            <h6>System</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>CPU Usage</span><strong id="metricCPU">--%</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Memory Usage</span><strong id="metricMemory">--%</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Session Time</span><strong id="metricSession">-- min</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Served directly by Flask-SocketIO — always matches the server version -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let realtimeChart, keyboardChart, mouseChart, webcamChart, systemChart;
+        let socket;
+        const maxDataPoints = 60;
+        const chartData = {
+            labels: [],
+            risk: [],
+            keyboard: { speed: [], errors: [], fatigue: [] },
+            mouse: { speed: [], clicks: [], fatigue: [] },
+            webcam: { blinks: [], eyeOpenness: [], fatigue: [] },
+            system: { cpu: [], memory: [], fatigue: [] }
+        };
+
+        const chartDefaults = {
+                    responsive: true,
+                    animation: { duration: 0 },
+            plugins: { legend: { labels: { font: { family: 'Inter', size: 11 }, boxWidth: 12 } } },
+            scales: { x: { display: false }, y: { grid: { color: '#f0f6fc' }, ticks: { font: { family: 'Inter', size: 11 } } } }
+            };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeCharts();
+            initializeSocket();
+            ensureMonitoringActive();   // ① start monitoring if it isn't running
+            fetchInitialData();         // ② populate metrics immediately via REST
+            startRestFallbackPoller();  // ③ keep polling via REST as a safety net
+        });
+
+        // ── Monitoring bootstrap ──────────────────────────────────────────────
+        async function ensureMonitoringActive() {
+            try {
+                const statusRes = await fetch('/api/status');
+                if (!statusRes.ok) return;
+                const status = await statusRes.json();
+                if (!status.monitoring_active) {
+                    await fetch('/api/start', { method: 'POST' });
+                    console.log('Monitoring started from dashboard.');
+                }
+            } catch (e) {
+                console.warn('Could not check/start monitoring:', e);
+            }
+        }
+
+        // ── Immediate REST load ───────────────────────────────────────────────
+        async function fetchInitialData() {
+            try {
+                const res = await fetch('/api/predict');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.features && data.prediction) {
+                    updateDashboard(data);
+                }
+            } catch (e) {
+                console.warn('Initial data fetch failed:', e);
+            }
+        }
+
+        // ── REST fallback poller (runs every 3 s when socket is disconnected) ─
+        function startRestFallbackPoller() {
+            setInterval(async () => {
+                if (socket && socket.connected) return; // socket is fine, skip
+                try {
+                    const res = await fetch('/api/predict');
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (data.features && data.prediction) {
+                        updateDashboard(data);
+                    }
+                } catch (e) { /* silently ignore */ }
+            }, 3000);
+        }
+
+        // ── Chart initialisation ──────────────────────────────────────────────
+        function initializeCharts() {
+            const riskCtx = document.getElementById('realtimeRiskChart').getContext('2d');
+            realtimeChart = new Chart(riskCtx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{ label: 'Risk Score', data: chartData.risk, borderColor: '#4A90D9', backgroundColor: 'rgba(74,144,217,0.08)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 }]
+                },
+                options: { ...chartDefaults, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 1, grid: { color: '#f0f6fc' }, ticks: { callback: v => Math.round(v * 100) + '%', font: { family: 'Inter', size: 11 } } }, x: { display: false } } }
+            });
+
+            const kbCtx = document.getElementById('keyboardChart').getContext('2d');
+            keyboardChart = new Chart(kbCtx, {
+                type: 'line',
+                data: { labels: chartData.labels, datasets: [{ label: 'Speed', data: chartData.keyboard.speed, borderColor: '#4A90D9', tension: 0.4, pointRadius: 0, borderWidth: 2 }, { label: 'Fatigue', data: chartData.keyboard.fatigue, borderColor: '#e74c3c', tension: 0.4, pointRadius: 0, borderWidth: 2 }] },
+                options: chartDefaults
+            });
+
+            const msCtx = document.getElementById('mouseChart').getContext('2d');
+            mouseChart = new Chart(msCtx, {
+                type: 'line',
+                data: { labels: chartData.labels, datasets: [{ label: 'Speed', data: chartData.mouse.speed, borderColor: '#27ae60', tension: 0.4, pointRadius: 0, borderWidth: 2 }, { label: 'Fatigue', data: chartData.mouse.fatigue, borderColor: '#e74c3c', tension: 0.4, pointRadius: 0, borderWidth: 2 }] },
+                options: chartDefaults
+            });
+
+            const wcCtx = document.getElementById('webcamChart').getContext('2d');
+            webcamChart = new Chart(wcCtx, {
+                type: 'line',
+                data: { labels: chartData.labels, datasets: [{ label: 'Blink Rate', data: chartData.webcam.blinks, borderColor: '#f39c12', tension: 0.4, pointRadius: 0, borderWidth: 2 }, { label: 'Fatigue', data: chartData.webcam.fatigue, borderColor: '#e74c3c', tension: 0.4, pointRadius: 0, borderWidth: 2 }] },
+                options: chartDefaults
+            });
+
+            const sysCtx = document.getElementById('systemChart').getContext('2d');
+            systemChart = new Chart(sysCtx, {
+                type: 'line',
+                data: { labels: chartData.labels, datasets: [{ label: 'CPU', data: chartData.system.cpu, borderColor: '#7ab8f5', tension: 0.4, pointRadius: 0, borderWidth: 2 }, { label: 'Memory', data: chartData.system.memory, borderColor: '#2f6fb5', tension: 0.4, pointRadius: 0, borderWidth: 2 }] },
+                options: chartDefaults
+            });
+        }
+
+        // ── Socket setup ──────────────────────────────────────────────────────
+        function initializeSocket() {
+            socket = io();
+            socket.on('connect', () => {
+                document.querySelectorAll('.live-dot').forEach(d => d.style.background = '#27ae60');
+            });
+            socket.on('disconnect', () => {
+                document.querySelectorAll('.live-dot').forEach(d => d.style.background = '#aaa');
+            });
+            socket.on('data_update', (data) => { updateDashboard(data); });
+            // Request fresh data every 2 s via socket
+            setInterval(() => { if (socket && socket.connected) socket.emit('request_update'); }, 2000);
+        }
+
+        // ── Core update functions ─────────────────────────────────────────────
+        function updateDashboard(data) {
+            const features   = data.features   || {};
+            const prediction = data.prediction || {};
+            const timestamp  = new Date().toLocaleTimeString();
+            addDataPoint(timestamp, prediction, features);
+            updateRiskDisplay(prediction);
+            updateMetrics(features);
+            updateCharts();
+        }
+
+        function addDataPoint(timestamp, prediction, features) {
+            if (chartData.labels.length >= maxDataPoints) {
+                chartData.labels.shift(); chartData.risk.shift();
+                Object.keys(chartData.keyboard).forEach(k => chartData.keyboard[k].shift());
+                Object.keys(chartData.mouse).forEach(k => chartData.mouse[k].shift());
+                Object.keys(chartData.webcam).forEach(k => chartData.webcam[k].shift());
+                Object.keys(chartData.system).forEach(k => chartData.system[k].shift());
+            }
+            chartData.labels.push(timestamp);
+            chartData.risk.push(prediction.risk_score || 0);
+
+            const kb = features.keyboard || {};
+            chartData.keyboard.speed.push((kb.typing_speed   || 0) / 300);
+            chartData.keyboard.fatigue.push(kb.keyboard_fatigue_score || 0);
+
+            const ms = features.mouse || {};
+            chartData.mouse.speed.push((ms.avg_speed  || 0) / 1000);
+            chartData.mouse.fatigue.push(ms.mouse_fatigue_score || 0);
+
+            const wc = features.webcam || {};
+            chartData.webcam.blinks.push((wc.blink_rate || 0) / 30);
+            chartData.webcam.fatigue.push(wc.webcam_fatigue_score || 0);
+
+            const sys = features.system || {};
+            chartData.system.cpu.push((sys.avg_cpu    || 0) / 100);
+            chartData.system.memory.push((sys.avg_memory || 0) / 100);
+        }
+
+        function updateRiskDisplay(prediction) {
+            const score = prediction.risk_score || 0;
+            const level = prediction.risk_level  || 'low';
+            const card  = document.getElementById('currentRiskCard');
+            document.getElementById('currentRiskScore').textContent = Math.round(score * 100) + '%';
+
+            const levelText = { low: 'Low Risk', moderate: 'Moderate Risk', high: 'High Risk', critical: 'Critical Risk' };
+            document.getElementById('currentRiskLevel').textContent = levelText[level] || 'Low Risk';
+
+            // Only apply known level classes to avoid broken styling
+            const knownLevels = ['low', 'moderate', 'high', 'critical'];
+            card.className = 'card mb-4 risk-card risk-' + (knownLevels.includes(level) ? level : 'low');
+
+            if (prediction.migraine_type) {
+                document.getElementById('migraineTypeDisplay').classList.remove('d-none');
+                document.getElementById('migraineTypeBadge').textContent = prediction.migraine_type.replace(/_/g, ' ');
+            } else {
+                document.getElementById('migraineTypeDisplay').classList.add('d-none');
+            }
+        }
+
+        function updateMetrics(features) {
+            const kb = features.keyboard || {};
+            document.getElementById('metricTypingSpeed').textContent = (kb.typing_speed   !== undefined ? Math.round(kb.typing_speed)              : 0) + ' kpm';
+            document.getElementById('metricErrorRate').textContent   = (kb.error_rate      !== undefined ? Math.round(kb.error_rate * 100)          : 0) + '%';
+            document.getElementById('metricRhythm').textContent      = (kb.rhythm_consistency !== undefined ? kb.rhythm_consistency.toFixed(2)       : '0.00');
+
+            const ms = features.mouse || {};
+            document.getElementById('metricMouseSpeed').textContent = (ms.avg_speed   !== undefined ? Math.round(ms.avg_speed)   : 0) + ' px/s';
+            document.getElementById('metricClickRate').textContent  = (ms.click_rate  !== undefined ? Math.round(ms.click_rate)  : 0) + ' /min';
+            document.getElementById('metricJitter').textContent     = (ms.jitter_count !== undefined ? ms.jitter_count           : 0);
+
+            const wc = features.webcam || {};
+            document.getElementById('metricBlinkRate').textContent    = (wc.blink_rate        !== undefined ? Math.round(wc.blink_rate)              : 0) + ' /min';
+            document.getElementById('metricEyeOpenness').textContent  = (wc.avg_eye_openness  !== undefined ? Math.round(wc.avg_eye_openness * 100)  : 0) + '%';
+            document.getElementById('metricFaceDistance').textContent = (wc.avg_face_distance !== undefined ? Math.round(wc.avg_face_distance)        : 0) + ' cm';
+
+            const sys = features.system || {};
+            document.getElementById('metricCPU').textContent     = (sys.avg_cpu                  !== undefined ? Math.round(sys.avg_cpu)                  : 0) + '%';
+            document.getElementById('metricMemory').textContent  = (sys.avg_memory               !== undefined ? Math.round(sys.avg_memory)               : 0) + '%';
+            document.getElementById('metricSession').textContent = (sys.session_duration_minutes !== undefined ? Math.round(sys.session_duration_minutes)  : 0) + ' min';
+        }
+
+        function updateCharts() {
+            realtimeChart.update();
+            keyboardChart.update();
+            mouseChart.update();
+            webcamChart.update();
+            systemChart.update();
+        }
+    </script>
+</body>
+</html>

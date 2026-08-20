@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migraine Predictor - Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-activity"></i> Migraine Predictor
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/history"><i class="bi bi-clock-history me-1"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/settings"><i class="bi bi-gear me-1"></i>Settings</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4 pb-5">
+
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle">Customise monitoring, alerts, and data preferences</p>
+        </div>
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-lg-8">
+
+                <!-- Monitoring Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-eye"></i> Monitoring Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="settings-section-title">Active Monitors</p>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3" style="background:var(--accent-blue);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="monitor-icon-wrap blue"><i class="bi bi-keyboard"></i></div>
+                                <div>
+                                    <div style="font-weight:600;font-size:0.92rem;">Keyboard Monitoring</div>
+                                    <small class="text-muted">Track typing patterns and errors</small>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="enableKeyboard" checked style="width:2.5em;height:1.3em;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3" style="background:var(--accent-blue);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="monitor-icon-wrap green"><i class="bi bi-mouse"></i></div>
+                                <div>
+                                    <div style="font-weight:600;font-size:0.92rem;">Mouse Monitoring</div>
+                                    <small class="text-muted">Track movement and click patterns</small>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="enableMouse" checked style="width:2.5em;height:1.3em;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3" style="background:var(--accent-blue);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="monitor-icon-wrap yellow"><i class="bi bi-camera-video"></i></div>
+                                <div>
+                                    <div style="font-weight:600;font-size:0.92rem;">Webcam Monitoring</div>
+                                    <small class="text-muted">Track facial cues and eye strain</small>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="enableWebcam" checked style="width:2.5em;height:1.3em;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3" style="background:var(--accent-blue);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="monitor-icon-wrap red"><i class="bi bi-cpu"></i></div>
+                                <div>
+                                    <div style="font-weight:600;font-size:0.92rem;">System Monitoring</div>
+                                    <small class="text-muted">Track CPU, memory, and app usage</small>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="enableSystem" checked style="width:2.5em;height:1.3em;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Thresholds -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-bell"></i> Alert Thresholds</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Moderate -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-600 mb-0" style="font-weight:600;">Moderate Risk Alert</label>
+                                <span class="badge px-3 py-2" style="background:rgba(243,156,18,0.15);color:#d68910;font-size:0.85rem;" id="thresholdModerateValue">40%</span>
+                            </div>
+                            <input type="range" class="form-range" id="thresholdModerate" min="20" max="60" value="40">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">20%</small>
+                                <small class="text-muted">60%</small>
+                            </div>
+                        </div>
+                        <!-- High -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="mb-0" style="font-weight:600;">High Risk Alert</label>
+                                <span class="badge px-3 py-2" style="background:rgba(231,76,60,0.12);color:#c0392b;font-size:0.85rem;" id="thresholdHighValue">60%</span>
+                            </div>
+                            <input type="range" class="form-range" id="thresholdHigh" min="40" max="80" value="60">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">40%</small>
+                                <small class="text-muted">80%</small>
+                            </div>
+                        </div>
+                        <!-- Critical -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="mb-0" style="font-weight:600;">Critical Risk Alert</label>
+                                <span class="badge px-3 py-2" style="background:rgba(30,58,95,0.1);color:#1e3a5f;font-size:0.85rem;" id="thresholdCriticalValue">80%</span>
+                            </div>
+                            <input type="range" class="form-range" id="thresholdCritical" min="60" max="95" value="80">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">60%</small>
+                                <small class="text-muted">95%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-bell-fill"></i> Notifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3" style="background:var(--accent-blue);">
+                            <div>
+                                <div style="font-weight:600;font-size:0.92rem;">Desktop Notifications</div>
+                                <small class="text-muted">Receive alerts on your desktop</small>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="enableNotifications" checked style="width:2.5em;height:1.3em;">
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-3 rounded-3" style="background:var(--accent-blue);">
+                            <div>
+                                <div style="font-weight:600;font-size:0.92rem;">Sound Alerts</div>
+                                <small class="text-muted">Play audio when risk level changes</small>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="enableSounds" style="width:2.5em;height:1.3em;">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-weight:600;">Minimum Time Between Alerts</label>
+                            <select class="form-select" id="notificationInterval">
+                                <option value="15">15 minutes</option>
+                                <option value="30" selected>30 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="120">2 hours</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Baseline Calibration -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-sliders"></i> Baseline Calibration</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            Calibrate the system to learn your normal behaviour patterns.
+                            This improves prediction accuracy by establishing a personal baseline.
+                        </p>
+                        <div class="alert mb-3 rounded-3" style="background:var(--accent-blue);border:1.5px solid var(--card-border);color:var(--text-primary);">
+                            <i class="bi bi-info-circle me-2" style="color:var(--primary-blue);"></i>
+                            For best results, calibrate when you're feeling well and working normally.
+                            The calibration process takes about <strong>5 minutes</strong>.
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-primary" id="startCalibration">
+                                <i class="bi bi-play-fill me-1"></i> Start Calibration
+                            </button>
+                            <button class="btn btn-outline-secondary" id="resetCalibration">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Defaults
+                            </button>
+                        </div>
+                        <div class="mt-3 d-none" id="calibrationProgress">
+                            <div class="progress mb-2">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                     role="progressbar" style="width:0%" id="calibrationBar"></div>
+                            </div>
+                            <small class="text-muted" id="calibrationStatus">Calibrating...</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-database"></i> Data Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 h-100" style="background:var(--accent-blue);border:1.5px solid var(--card-border);">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="bi bi-download" style="color:var(--primary-blue);font-size:1.1rem;"></i>
+                                        <span style="font-weight:600;">Export Data</span>
+                                    </div>
+                                    <p class="text-muted small mb-3">Download your data for backup or analysis</p>
+                                    <button class="btn btn-outline-primary btn-sm" id="exportAllData">
+                                        <i class="bi bi-download me-1"></i> Export All Data
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 h-100" style="background:#fff8f7;border:1.5px solid #fcd5d0;">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="bi bi-trash" style="color:#e74c3c;font-size:1.1rem;"></i>
+                                        <span style="font-weight:600;">Clear Data</span>
+                                    </div>
+                                    <p class="text-muted small mb-3">Permanently remove all collected data</p>
+                                    <button class="btn btn-outline-danger btn-sm" id="clearData">
+                                        <i class="bi bi-trash me-1"></i> Clear All Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="d-grid mb-4">
+                    <button class="btn btn-primary btn-lg" id="saveSettings">
+                        <i class="bi bi-check-lg me-2"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="col-lg-4">
+
+                <!-- About Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-info-circle"></i> About</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="monitor-icon-wrap blue" style="width:48px;height:48px;border-radius:12px;font-size:1.4rem;">
+                                <i class="bi bi-activity"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:700;font-size:1rem;">Migraine Predictor</div>
+                                <small class="text-muted">Version 1.0.0</small>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            A digital phenotyping system for migraine prediction using real-time activity monitoring.
+                        </p>
+                        <div style="border-top:1px solid var(--card-border);" class="pt-3">
+                            <div style="font-weight:600;font-size:0.85rem;margin-bottom:8px;">How It Works</div>
+                            <ul class="text-muted small mb-0" style="padding-left:1.2rem;">
+                                <li class="mb-1">Monitors typing patterns</li>
+                                <li class="mb-1">Tracks mouse movements</li>
+                                <li class="mb-1">Analyses facial expressions</li>
+                                <li>Observes system usage</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-shield-check"></i> Privacy</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="privacy-check-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>All data is stored locally</span>
+                        </div>
+                        <div class="privacy-check-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>No data sent to external servers</span>
+                        </div>
+                        <div class="privacy-check-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Webcam images are never saved</span>
+                        </div>
+                        <div class="privacy-check-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Keyboard content is not recorded</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Data Confirmation Modal -->
+    <div class="modal fade" id="clearDataModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background:linear-gradient(135deg,#e74c3c,#c0392b);">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Clear All Data</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-3">Are you sure you want to delete all collected data? <strong>This action cannot be undone.</strong></p>
+                    <div class="p-3 rounded-3" style="background:#fff8f7;border:1.5px solid #fcd5d0;">
+                        <p class="text-muted small mb-1 fw-bold">This will remove:</p>
+                        <ul class="text-muted small mb-0">
+                            <li>All activity logs</li>
+                            <li>All predictions</li>
+                            <li>Calibration data</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmClearData">
+                        <i class="bi bi-trash me-1"></i> Delete All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            ['Moderate', 'High', 'Critical'].forEach(level => {
+                const slider = document.getElementById('threshold' + level);
+                const valueEl = document.getElementById('threshold' + level + 'Value');
+                slider.addEventListener('input', function () { valueEl.textContent = this.value + '%'; });
+            });
+
+            document.getElementById('saveSettings').addEventListener('click', saveSettings);
+            document.getElementById('startCalibration').addEventListener('click', startCalibration);
+            document.getElementById('resetCalibration').addEventListener('click', resetCalibration);
+            document.getElementById('exportAllData').addEventListener('click', exportAllData);
+            document.getElementById('clearData').addEventListener('click', function () {
+                new bootstrap.Modal(document.getElementById('clearDataModal')).show();
+            });
+            document.getElementById('confirmClearData').addEventListener('click', clearAllData);
+        });
+
+        function saveSettings() {
+            const settings = {
+                enable_keyboard: document.getElementById('enableKeyboard').checked,
+                enable_mouse: document.getElementById('enableMouse').checked,
+                enable_webcam: document.getElementById('enableWebcam').checked,
+                enable_system: document.getElementById('enableSystem').checked,
+                alert_threshold_moderate: parseInt(document.getElementById('thresholdModerate').value) / 100,
+                alert_threshold_high: parseInt(document.getElementById('thresholdHigh').value) / 100,
+                alert_threshold_critical: parseInt(document.getElementById('thresholdCritical').value) / 100,
+                enable_notifications: document.getElementById('enableNotifications').checked,
+                notification_interval: parseInt(document.getElementById('notificationInterval').value)
+            };
+            localStorage.setItem('migraineSettings', JSON.stringify(settings));
+            showToast('Settings saved successfully', 'success');
+        }
+
+        function startCalibration() {
+            const progressDiv = document.getElementById('calibrationProgress');
+            const bar = document.getElementById('calibrationBar');
+            const status = document.getElementById('calibrationStatus');
+            progressDiv.classList.remove('d-none');
+            document.getElementById('startCalibration').disabled = true;
+            let progress = 0;
+            const steps = ['Calibrating keyboard baseline...', 'Calibrating mouse baseline...', 'Calibrating webcam baseline...', 'Calibrating system baseline...', 'Finalising...'];
+            const interval = setInterval(() => {
+                progress += 2;
+                bar.style.width = progress + '%';
+                status.textContent = steps[Math.floor(progress / 22)] || 'Finalising...';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    status.textContent = '✓ Calibration complete!';
+                    document.getElementById('startCalibration').disabled = false;
+                    showToast('Calibration completed successfully', 'success');
+                    setTimeout(() => { progressDiv.classList.add('d-none'); bar.style.width = '0%'; }, 2500);
+                }
+            }, 300);
+        }
+
+        function resetCalibration() {
+            if (confirm('Reset all calibration data to defaults?')) showToast('Calibration reset to defaults', 'info');
+        }
+
+        async function exportAllData() {
+            try {
+                const response = await fetch('/api/history?limit=10000');
+                const data = await response.json();
+                const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), ...data }, null, 2)], { type: 'application/json' });
+                const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `migraine_data_${new Date().toISOString().split('T')[0]}.json` });
+                a.click();
+                showToast('Data exported successfully', 'success');
+            } catch (e) { showToast('Error exporting data', 'danger'); }
+        }
+
+        function clearAllData() {
+            bootstrap.Modal.getInstance(document.getElementById('clearDataModal')).hide();
+            localStorage.removeItem('migraineSettings');
+            showToast('All data cleared', 'warning');
+        }
+
+        function showToast(message, type) {
+            const id = 'toast-' + Date.now();
+            const icons = { success: 'check-circle-fill', danger: 'x-circle-fill', warning: 'exclamation-triangle-fill', info: 'info-circle-fill' };
+            const colors = { success: '#27ae60', danger: '#e74c3c', warning: '#f39c12', info: '#4A90D9' };
+            document.getElementById('toastContainer').insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="toast align-items-center border-0 text-white" role="alert"
+                     style="background:${colors[type] || '#4A90D9'};border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center gap-2">
+                            <i class="bi bi-${icons[type] || 'info-circle-fill'}"></i> ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `);
+            new bootstrap.Toast(document.getElementById(id), { delay: 3500 }).show();
+        }
+    </script>
+</body>
+</html>

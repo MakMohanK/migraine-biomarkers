@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migraine Predictor - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-activity"></i> Migraine Predictor
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="bi bi-clock-history me-1"></i>History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings"><i class="bi bi-gear me-1"></i>Settings</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge status-inactive px-3 py-2" id="statusBadge">
+                        <i class="bi bi-circle-fill me-1" style="font-size:0.55rem;"></i> Inactive
+                    </span>
+                    <button class="btn btn-light btn-sm px-3" id="toggleMonitoring">
+                        <i class="bi bi-play-fill me-1"></i> Start Monitoring
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4 pb-5">
+
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 class="page-title">Health Dashboard</h1>
+            <p class="page-subtitle">Real-time migraine risk monitoring based on your activity patterns</p>
+        </div>
+
+        <!-- Notification Permission Banner (hidden by JS once permission is granted) -->
+        <div id="notifPermissionBanner" class="notif-permission-banner d-none mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <span style="font-size:1.6rem;">🔔</span>
+                <div class="flex-grow-1">
+                    <div class="fw-bold" style="font-size:0.92rem;">Enable Desktop Notifications</div>
+                    <small class="text-muted">Get instant OS-level alerts when your migraine risk rises sharply — even when this tab is in the background.</small>
+                </div>
+                <div class="d-flex gap-2 flex-shrink-0">
+                    <button class="btn btn-primary btn-sm" onclick="askNotificationPermission()">
+                        <i class="bi bi-bell-fill me-1"></i> Enable Alerts
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="dismissNotifBanner()">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Blocked Banner (shown when user previously denied permission) -->
+        <div id="notifBlockedBanner" class="notif-blocked-banner d-none mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <span style="font-size:1.6rem;">🔕</span>
+                <div class="flex-grow-1">
+                    <div class="fw-bold" style="font-size:0.92rem;">Desktop Notifications are Blocked</div>
+                    <small>To receive migraine risk alerts, click the 🔒 lock icon in your browser's address bar → <strong>Notifications</strong> → <strong>Allow</strong>, then reload the page.</small>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm flex-shrink-0" onclick="document.getElementById('notifBlockedBanner').classList.add('d-none')">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+
+        <!-- Risk Alert Banner -->
+        <div class="alert alert-dismissible fade show d-none mb-4" id="riskAlert" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                <div>
+                    <strong id="alertTitle">Elevated Risk Detected</strong>
+                    <p class="mb-0 small" id="alertMessage">Consider taking a break.</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Risk Score Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card risk-card" id="riskCard">
+                    <div class="card-body py-5 text-center position-relative">
+                        <p class="mb-3" style="color:rgba(255,255,255,0.7);font-size:0.9rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;">
+                            Current Migraine Risk
+                        </p>
+                        <div class="risk-gauge mb-3">
+                            <div class="risk-score-circle" id="riskScoreCircle">
+                                <span class="risk-score-value" id="riskScoreValue">0%</span>
+                            </div>
+                        </div>
+                        <h3 class="risk-level mb-2" id="riskLevel">Low Risk</h3>
+                        <p class="mb-0" style="color:rgba(255,255,255,0.65);font-size:0.88rem;" id="riskTrend">
+                            <i class="bi bi-arrow-right"></i> Stable
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitor Cards -->
+        <div class="row mb-4 g-3">
+            <!-- Keyboard Monitor -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 monitor-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="monitor-icon-wrap blue"><i class="bi bi-keyboard"></i></div>
+                                <span class="fw-600" style="font-weight:600;font-size:0.92rem;">Keyboard</span>
+                            </div>
+                            <span class="badge status-inactive" id="keyboardStatus">Inactive</span>
+                        </div>
+                        <div class="monitor-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Typing Speed</span>
+                                <span class="stat-value" id="typingSpeed">-- wpm</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Error Rate</span>
+                                <span class="stat-value" id="errorRate">--%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Fatigue Score</span>
+                                <div class="progress flex-grow-1 ms-2" style="width:60%">
+                                    <div class="progress-bar" id="keyboardFatigue" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mouse Monitor -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 monitor-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="monitor-icon-wrap green"><i class="bi bi-mouse"></i></div>
+                                <span style="font-weight:600;font-size:0.92rem;">Mouse</span>
+                            </div>
+                            <span class="badge status-inactive" id="mouseStatus">Inactive</span>
+                        </div>
+                        <div class="monitor-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Click Rate</span>
+                                <span class="stat-value" id="clickRate">-- /min</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Idle Time</span>
+                                <span class="stat-value" id="idleTime">-- sec</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Fatigue Score</span>
+                                <div class="progress flex-grow-1 ms-2" style="width:60%">
+                                    <div class="progress-bar" style="background:linear-gradient(90deg,#6ee2b0,#27ae60);" id="mouseFatigue" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Webcam Monitor -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 monitor-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="monitor-icon-wrap yellow"><i class="bi bi-camera-video"></i></div>
+                                <span style="font-weight:600;font-size:0.92rem;">Webcam</span>
+                            </div>
+                            <span class="badge status-inactive" id="webcamStatus">Inactive</span>
+                        </div>
+                        <div class="monitor-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Blink Rate</span>
+                                <span class="stat-value" id="blinkRate">-- /min</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Eye Strain</span>
+                                <span class="stat-value" id="eyeStrain">--%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Fatigue Score</span>
+                                <div class="progress flex-grow-1 ms-2" style="width:60%">
+                                    <div class="progress-bar" style="background:linear-gradient(90deg,#fde08a,#f39c12);" id="webcamFatigue" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Monitor -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 monitor-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="monitor-icon-wrap red"><i class="bi bi-cpu"></i></div>
+                                <span style="font-weight:600;font-size:0.92rem;">System</span>
+                            </div>
+                            <span class="badge status-inactive" id="systemStatus">Inactive</span>
+                        </div>
+                        <div class="monitor-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Session Time</span>
+                                <span class="stat-value" id="sessionTime">-- min</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">CPU Usage</span>
+                                <span class="stat-value" id="cpuUsage">--%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Fatigue Score</span>
+                                <div class="progress flex-grow-1 ms-2" style="width:60%">
+                                    <div class="progress-bar" style="background:linear-gradient(90deg,#f5a0a0,#e74c3c);" id="systemFatigue" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contributing Factors & Recommendations -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5><i class="bi bi-graph-up"></i> Contributing Factors</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="contributingFactors">
+                            <div class="text-center py-3">
+                                <i class="bi bi-check-circle text-success" style="font-size:2rem;"></i>
+                                <p class="text-muted mt-2 mb-0">No significant factors detected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5><i class="bi bi-lightbulb"></i> Recommendations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recommendations">
+                            <div class="text-center py-3">
+                                <i class="bi bi-emoji-smile" style="font-size:2rem;color:var(--primary-blue);"></i>
+                                <p class="text-muted mt-2 mb-0">Continue working normally</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <button class="btn btn-primary btn-lg me-3 px-4" id="suggestTherapyBtn"
+                        data-bs-toggle="modal" data-bs-target="#therapySuggestionModal">
+                    <i class="bi bi-heart-pulse me-2"></i> Suggest Me a Therapy
+                </button>
+                <button class="btn btn-outline-danger btn-lg px-4" data-bs-toggle="modal" data-bs-target="#reportModal">
+                    <i class="bi bi-exclamation-circle me-2"></i> Report Migraine
+                </button>
+                <p class="text-muted mt-3 small">Get a personalised therapy recommendation or report a migraine to improve predictions</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Therapy Suggestion Modal -->
+    <div class="modal fade" id="therapySuggestionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-heart-pulse me-2"></i> Therapy Suggestion</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Progress bar -->
+                    <div id="therapyProgress" class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted fw-600" id="therapyStepLabel">Step 1 of 4</small>
+                            <small style="color:var(--primary-blue);font-weight:600;" id="therapyStepDesc">Pain Location</small>
+                        </div>
+                        <div class="progress" style="height:6px;">
+                            <div class="progress-bar" id="therapyProgressBar" style="width:25%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div id="therapyStep1">
+                        <h6 class="mb-3 fw-bold">📍 Where do you feel the pain or discomfort?</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn therapy-option text-start" data-step="1" data-value="front">🔵 Front of my head, forehead or temples</button>
+                            <button class="btn therapy-option text-start" data-step="1" data-value="back">🔵 Back of my head or neck</button>
+                            <button class="btn therapy-option text-start" data-step="1" data-value="both">🔵 Both front and back</button>
+                            <button class="btn therapy-option text-start" data-step="1" data-value="all">🔵 All around / whole head</button>
+                            <button class="btn therapy-option text-start" data-step="1" data-value="none">🔵 No pain yet — just want to be prepared</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div id="therapyStep2" class="d-none">
+                        <h6 class="mb-3 fw-bold">🔍 How would you describe the pain?</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn therapy-option text-start" data-step="2" data-value="throbbing">💓 Throbbing or pulsing</button>
+                            <button class="btn therapy-option text-start" data-step="2" data-value="pressure">🫸 Pressure or tightness</button>
+                            <button class="btn therapy-option text-start" data-step="2" data-value="sharp">⚡ Sharp or stabbing</button>
+                            <button class="btn therapy-option text-start" data-step="2" data-value="tension">😤 Just tension or stiffness</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div id="therapyStep3" class="d-none">
+                        <h6 class="mb-3 fw-bold">📊 How intense is the pain right now?</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn therapy-option text-start" data-step="3" data-value="mild">🟢 Mild — I can still work normally</button>
+                            <button class="btn therapy-option text-start" data-step="3" data-value="moderate">🟡 Moderate — It's hard to focus</button>
+                            <button class="btn therapy-option text-start" data-step="3" data-value="severe">🔴 Severe — I can barely function</button>
+                            <button class="btn therapy-option text-start" data-step="3" data-value="none">⚪ No pain yet</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div id="therapyStep4" class="d-none">
+                        <h6 class="mb-3 fw-bold">💡 Are you sensitive to light or sound right now?</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn therapy-option text-start" data-step="4" data-value="very">😣 Yes, very sensitive — light and sound bother me a lot</button>
+                            <button class="btn therapy-option text-start" data-step="4" data-value="somewhat">😐 Somewhat — a little bothered</button>
+                            <button class="btn therapy-option text-start" data-step="4" data-value="no">😊 No, not sensitive at all</button>
+                        </div>
+                    </div>
+
+                    <!-- Result -->
+                    <div id="therapyResult" class="d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" id="therapyBackBtn" style="display:none;">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="therapyRestartBtn" style="display:none;">
+                        <i class="bi bi-arrow-clockwise"></i> Start Over
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Migraine Modal -->
+    <div class="modal fade" id="reportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-circle me-2"></i>Report Migraine</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Migraine Type</label>
+                            <select class="form-select" id="migraineType">
+                                <option value="unknown">Not Sure</option>
+                                <option value="tension">Tension Headache</option>
+                                <option value="migraine_with_aura">Migraine with Aura</option>
+                                <option value="migraine_without_aura">Migraine without Aura</option>
+                                <option value="cluster">Cluster Headache</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Intensity (1–10)</label>
+                            <input type="range" class="form-range" id="migraineIntensity" min="1" max="10" value="5">
+                            <div class="d-flex justify-content-between mt-1">
+                                <small class="text-muted">Mild</small>
+                                <span class="badge" style="background:var(--accent-blue-mid);color:var(--primary-blue-dark);" id="intensityValue">5</span>
+                                <small class="text-muted">Severe</small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Notes <span class="text-muted fw-normal">(optional)</span></label>
+                            <textarea class="form-control" id="migraineNotes" rows="3" placeholder="Any additional details..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="submitReport">Submit Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Served directly by Flask-SocketIO — always matches the server version -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
